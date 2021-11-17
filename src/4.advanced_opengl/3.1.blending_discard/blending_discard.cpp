@@ -81,6 +81,7 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    // 箱子顶点属性
     float cubeVertices[] = {
         // positions          // texture Coords
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -125,6 +126,7 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+    // 地板顶点属性
     float planeVertices[] = {
         // positions          // texture Coords 
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
@@ -135,6 +137,7 @@ int main()
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+    // 草丛顶点属性
     float transparentVertices[] = {
         // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
@@ -145,6 +148,8 @@ int main()
         1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
         1.0f,  0.5f,  0.0f,  1.0f,  0.0f
     };
+    
+    // 创建、绑定3个顶点缓冲
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -180,12 +185,15 @@ int main()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
 
+        
+    // 加载三个纹理
     // load textures
     // -------------
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("resources/textures/marble.jpg").c_str());
     unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/metal.png").c_str());
     unsigned int transparentTexture = loadTexture(FileSystem::getPath("resources/textures/grass.png").c_str());
 
+    // 草丛位置
     // transparent vegetation locations
     // --------------------------------
     vector<glm::vec3> vegetation 
@@ -221,6 +229,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // 设置变换矩阵
         // draw objects
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -228,23 +237,31 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
+        
+        // 绘制两个箱子
         // cubes
+        // 画一个箱子
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        // 变换一下模型矩阵，再画一个
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        // 绘制地板
         // floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         model = glm::mat4(1.0f);
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+        // 绘制几个草丛
         // vegetation
         glBindVertexArray(transparentVAO);
         glBindTexture(GL_TEXTURE_2D, transparentTexture);
@@ -344,12 +361,16 @@ unsigned int loadTexture(char const * path)
         else if (nrComponents == 3)
             format = GL_RGB;
         else if (nrComponents == 4)
-            format = GL_RGBA;
+            format = GL_RGBA; // 有alpha通道
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
+        /*
+         由于使用透明值，纹理图像的顶部将会与底部边缘的纯色值进行插值。结果是一个半透明的有色边框，你可能会看见它环绕着你的纹理四边形。
+         要想避免这个，每当你alpha纹理的时候，请将纹理的环绕方式设置为GL_CLAMP_TO_EDGE
+         */
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

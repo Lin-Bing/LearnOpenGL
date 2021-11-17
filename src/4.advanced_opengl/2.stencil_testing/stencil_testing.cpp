@@ -72,6 +72,9 @@ int main()
     }
 
     // configure global opengl state
+    // 全局配置
+    // 开启深度测试：默认值GL_LESS丢弃大于等于当前深度缓冲值的所有片段
+    // 开启模板测试：不等于1时通过测试，通过模板&深度测试时，写入模板缓冲
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -79,13 +82,16 @@ int main()
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
+    
     // build and compile shaders
+    // 着色器、边框着色器
     // -------------------------
     Shader shader("2.stencil_testing.vs", "2.stencil_testing.fs");
     Shader shaderSingleColor("2.stencil_testing.vs", "2.stencil_single_color.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    // 箱子顶点属性：位置、纹理坐标
     float cubeVertices[] = {
         // positions          // texture Coords
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -130,6 +136,7 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+    // 地板顶点属性：位置、纹理坐标
     float planeVertices[] = {
         // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
@@ -140,7 +147,9 @@ int main()
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+    
     // cube VAO
+    // 箱子：绑定顶点缓冲数据、设置顶点属性解析
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &cubeVBO);
@@ -152,7 +161,9 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
+    
     // plane VAO
+    // 地板：绑定顶点缓冲数据、设置顶点属性解析
     unsigned int planeVAO, planeVBO;
     glGenVertexArrays(1, &planeVAO);
     glGenBuffers(1, &planeVBO);
@@ -166,6 +177,7 @@ int main()
     glBindVertexArray(0);
 
     // load textures
+    // 绑定、加载箱子、地板纹理
     // -------------
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("resources/textures/marble.jpg").c_str());
     unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/metal.png").c_str());
@@ -192,8 +204,10 @@ int main()
         // render
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        // 注意：需要清除模板缓冲
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // don't forget to clear the stencil buffer!
-
+        
+        // 设置视觉、模型矩阵
         // set uniforms
         shaderSingleColor.use();
         glm::mat4 model = glm::mat4(1.0f);
@@ -206,7 +220,9 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
+        // 0.绘制地板
         // draw floor as normal, but don't write the floor to the stencil buffer, we only care about the containers. We set its mask to 0x00 to not write to the stencil buffer.
+        // 禁用模板缓冲写入：模板缓冲写入时&掩码操作设置为0x00，写入缓冲的所有模板值最后都会变成0，等于禁用写入
         glStencilMask(0x00);
         // floor
         glBindVertexArray(planeVAO);
@@ -215,14 +231,18 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
+        // 1.绘制箱子，并写入模板缓冲，把模板缓冲在箱子被绘制的地方的模板值更新为1
         // 1st. render pass, draw objects as normal, writing to the stencil buffer
         // --------------------------------------------------------------------
+        // 模板测试：GL_ALWAYS：永远通过模板测试， 1：模板缓冲跟参考值1做比较（此处GL_ALWAYS则不需要比较），也用于满足模板缓冲写入时设置为模板缓冲的值
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        // 启用模板缓冲写入
         glStencilMask(0xFF);
         // cubes
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        // 绘制两个箱子到不同位置：投影矩阵不同
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -231,16 +251,20 @@ int main()
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // 2.绘制边框，
         // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-        // Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not drawn, thus only drawing 
+        // Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not drawn, thus only drawing
         // the objects' size differences, making it look like borders.
         // -----------------------------------------------------------------------------------------------------------------------------
+        // 模板测试：放大箱子后为了绘制出边框，在模板缓冲值不等于1时通过测试
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        // 禁用模板缓冲写入
         glStencilMask(0x00);
+        // 禁用深度测试，让放大的箱子，即边框，不会被地板所覆盖。
         glDisable(GL_DEPTH_TEST);
         shaderSingleColor.use();
-        float scale = 1.1;
-        // cubes
+        float scale = 1.1; // 放大1.1倍
+        // cubes 绘制两个放大的箱子（边框）
         glBindVertexArray(cubeVAO);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
         model = glm::mat4(1.0f);
@@ -254,6 +278,7 @@ int main()
         shaderSingleColor.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+        // 恢复模板、深度测试状态
         glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glEnable(GL_DEPTH_TEST);
@@ -296,7 +321,7 @@ void processInput(GLFWwindow *window)
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }

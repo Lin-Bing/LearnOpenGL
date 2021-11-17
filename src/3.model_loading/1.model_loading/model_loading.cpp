@@ -69,6 +69,7 @@ int main()
         return -1;
     }
 
+    
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     stbi_set_flip_vertically_on_load(true);
 
@@ -76,10 +77,12 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    // 着色器
     // build and compile shaders
     // -------------------------
     Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
 
+    // 模型
     // load models
     // -----------
     Model ourModel(FileSystem::getPath("resources/objects/backpack/backpack.obj"));
@@ -110,19 +113,20 @@ int main()
         // don't forget to enable shader before setting uniforms
         ourShader.use();
 
+        // 设置矩阵
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
+        
+        // 绘制模型
         ourModel.Draw(ourShader);
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -157,7 +161,7 @@ void processInput(GLFWwindow *window)
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
