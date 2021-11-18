@@ -71,10 +71,14 @@ int main()
         return -1;
     }
 
+    
     // configure global opengl state
+    // 设置全局状态：深度测试、混合
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    // 开启混合
     glEnable(GL_BLEND);
+    // 设置 源和目标因子，源因子：源alpha，目标因子：1-源alpha
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // build and compile shaders
@@ -83,6 +87,7 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    // 箱子顶点属性：位置、纹理坐标
     float cubeVertices[] = {
         // positions          // texture Coords
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -127,6 +132,7 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+    // 地板顶点属性
     float planeVertices[] = {
         // positions          // texture Coords 
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
@@ -137,6 +143,7 @@ int main()
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+    // 窗顶点属性
     float transparentVertices[] = {
         // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
@@ -182,12 +189,14 @@ int main()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
 
+    // 创建纹理：箱子、地板、窗户
     // load textures
     // -------------
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("resources/textures/marble.jpg").c_str());
     unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/metal.png").c_str());
     unsigned int transparentTexture = loadTexture(FileSystem::getPath("resources/textures/window.png").c_str());
 
+    // 5个窗户位置
     // transparent window locations
     // --------------------------------
     vector<glm::vec3> windows
@@ -219,6 +228,7 @@ int main()
         processInput(window);
 
         // sort the transparent windows before rendering
+        // 对透明物体排序：即根据窗户与摄像机距离排序
         // ---------------------------------------------
         std::map<float, glm::vec3> sorted;
         for (unsigned int i = 0; i < windows.size(); i++)
@@ -232,6 +242,12 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /*
+         绘制
+         先绘制所有不透明的物体。
+         对所有透明的物体排序。
+         按顺序绘制所有透明的物体
+         */
         // draw objects
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -239,7 +255,8 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        // cubes
+        
+        // cubes 绘制两个箱子
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
@@ -250,13 +267,15 @@ int main()
         model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        // floor
+        
+        // floor 绘制地板
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         model = glm::mat4(1.0f);
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        // windows (from furthest to nearest)
+        
+        // windows (from furthest to nearest) 由远到近绘制窗户，避免深度测试和混合同时作用时，透明物体后面的物体不通过深度测试片段被丢弃
         glBindVertexArray(transparentVAO);
         glBindTexture(GL_TEXTURE_2D, transparentTexture);
         for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
