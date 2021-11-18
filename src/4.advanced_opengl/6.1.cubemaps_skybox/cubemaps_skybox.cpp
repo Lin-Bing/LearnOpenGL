@@ -262,8 +262,10 @@ int main()
         glBindVertexArray(0);
 
         // 绘制天空盒
+        // 注：最后渲染天空盒子，提前深度测试优化性能，天空盒深度缓冲值为1，因此需改为<=1时通过测试，否则丢弃片段
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        // 设置观察、投影矩阵，为何不需要模型矩阵？？？
         skyboxShader.use();
         view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
         skyboxShader.setMat4("view", view);
@@ -274,6 +276,7 @@ int main()
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+        // 重置深度缓冲
         glDepthFunc(GL_LESS); // set depth function back to default
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
