@@ -76,13 +76,16 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    // 创建着色器
     // build and compile shaders
     // -------------------------
-    Shader shader("6.1.cubemaps.vs", "6.1.cubemaps.fs");
-    Shader skyboxShader("6.1.skybox.vs", "6.1.skybox.fs");
+    Shader shader("6.1.cubemaps.vs", "6.1.cubemaps.fs"); // 箱子着色器
+    Shader skyboxShader("6.1.skybox.vs", "6.1.skybox.fs"); // 天空盒着色器
 
+    // 配置顶点缓冲数据
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    // 箱子顶点属性：位置、纹理坐标
     float cubeVertices[] = {
         // positions          // texture Coords
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -127,6 +130,8 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+    
+    // 天空盒顶点属性：位置，由于是立方体纹理贴图 顶点位置坐标就是纹理坐标
     float skyboxVertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -172,6 +177,7 @@ int main()
          1.0f, -1.0f,  1.0f
     };
 
+    // 箱子顶点缓冲设置
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -183,6 +189,8 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    
+    // 天空盒顶点缓冲设置
     // skybox VAO
     unsigned int skyboxVAO, skyboxVBO;
     glGenVertexArrays(1, &skyboxVAO);
@@ -193,10 +201,12 @@ int main()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+    // 加载纹理
     // load textures
     // -------------
+    // 箱子纹理
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("resources/textures/container.jpg").c_str());
-
+    // 天空盒子纹理
     vector<std::string> faces
     {
         FileSystem::getPath("resources/textures/skybox/right.jpg"),
@@ -208,11 +218,11 @@ int main()
     };
     unsigned int cubemapTexture = loadCubemap(faces);
 
+    // 绑定着色器纹理采样器
     // shader configuration
     // --------------------
     shader.use();
     shader.setInt("texture1", 0);
-
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
@@ -235,6 +245,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // 绘制箱子
         // draw scene as normal
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
@@ -250,6 +261,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
+        // 绘制天空盒
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use();
@@ -373,8 +385,9 @@ unsigned int loadTexture(char const * path)
     return textureID;
 }
 
+// 加载立方体贴图纹理
 // loads a cubemap texture from 6 individual texture faces
-// order:
+// order: 立方体纹理贴图目标枚举，枚举值按顺序递增
 // +X (right)
 // -X (left)
 // +Y (top)
@@ -384,16 +397,19 @@ unsigned int loadTexture(char const * path)
 // -------------------------------------------------------
 unsigned int loadCubemap(vector<std::string> faces)
 {
+    // 创建、绑定纹理，注意是绑定到立方体纹理 GL_TEXTURE_CUBE_MAP
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
+    // 加载6个面的纹理
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++)
     {
         unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
         if (data)
         {
+            // 设置图片数据到对应面纹理
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         }
@@ -403,8 +419,10 @@ unsigned int loadCubemap(vector<std::string> faces)
             stbi_image_free(data);
         }
     }
+    
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 正好处于两个面之间的纹理坐标可能不能击中一个面，环绕方式设置GL_CLAMP_TO_EDGE
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

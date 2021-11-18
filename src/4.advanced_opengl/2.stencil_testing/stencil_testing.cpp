@@ -234,7 +234,8 @@ int main()
         // 1.绘制箱子，并写入模板缓冲，把模板缓冲在箱子被绘制的地方的模板值更新为1
         // 1st. render pass, draw objects as normal, writing to the stencil buffer
         // --------------------------------------------------------------------
-        // 模板测试：GL_ALWAYS：永远通过模板测试， 1：模板缓冲跟参考值1做比较（此处GL_ALWAYS则不需要比较），也用于满足模板缓冲写入时设置为模板缓冲的值
+        // 模板测试：GL_ALWAYS：永远通过模板测试，被绘制
+        // 1：模板缓冲跟参考值1做比较（此处GL_ALWAYS则不需要比较），也用于满足模板缓冲写入时设置为模板缓冲的值
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         // 启用模板缓冲写入
         glStencilMask(0xFF);
@@ -256,7 +257,7 @@ int main()
         // Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not drawn, thus only drawing
         // the objects' size differences, making it look like borders.
         // -----------------------------------------------------------------------------------------------------------------------------
-        // 模板测试：放大箱子后为了绘制出边框，在模板缓冲值不等于1时通过测试
+        // 模板测试：放大箱子后为了绘制出边框，片段的模板值在模板缓冲值不等于1时通过测试，否则丢弃片段
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         // 禁用模板缓冲写入
         glStencilMask(0x00);
