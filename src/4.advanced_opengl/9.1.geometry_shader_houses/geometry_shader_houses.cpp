@@ -48,12 +48,17 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    
     // build and compile shaders
+    // 创建着色器，包含可选的几何着色器
     // -------------------------
     Shader shader("9.1.geometry_shader.vs", "9.1.geometry_shader.fs", "9.1.geometry_shader.gs");
 
+    
     // set up vertex data (and buffer(s)) and configure vertex attributes
+    // 配置顶点缓冲数据
     // ------------------------------------------------------------------
+    // 顶点属性：位置、颜色
     float points[] = {
         -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-left
          0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // top-right
@@ -81,6 +86,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // 绘制4个点 GL_POINTS
         // draw points
         shader.use();
         glBindVertexArray(VAO);

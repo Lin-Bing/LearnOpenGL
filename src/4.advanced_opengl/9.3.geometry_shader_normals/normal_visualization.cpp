@@ -79,8 +79,9 @@ int main()
     Shader shader("9.3.default.vs", "9.3.default.fs");
     Shader normalShader("9.3.normal_visualization.vs", "9.3.normal_visualization.fs", "9.3.normal_visualization.gs");
 
-    // load models
+    // load models 加载模型
     // -----------
+    // 图像加载时翻转y轴,避免图像颠倒
     stbi_set_flip_vertically_on_load(true);
     Model backpack(FileSystem::getPath("resources/objects/backpack/backpack.obj"));
 

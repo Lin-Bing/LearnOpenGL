@@ -32,6 +32,13 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+
+/*
+ 爆破效果
+ 将每个三角形沿着法向量的方向移动一小段时间。效果就是，整个物体看起来像是沿着每个三角形的法线向量爆炸一样
+ 效果就是，整个物体看起来像是沿着每个三角形的法线向量爆炸一样
+ */
+
 int main()
 {
     // glfw: initialize and configure
@@ -74,11 +81,11 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
-    // build and compile shaders
+    // build and compile shaders 加载着色器
     // -------------------------
     Shader shader("9.2.geometry_shader.vs", "9.2.geometry_shader.fs", "9.2.geometry_shader.gs");
 
-    // load models
+    // load models 加载模型
     // -----------
     Model nanosuit(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj")); 
 
@@ -110,9 +117,11 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("model", model);
 
+        // 着色器输入时间
         // add time component to geometry shader in the form of a uniform
         shader.setFloat("time", glfwGetTime());
 
+        // 绘制模型
         // draw model
         nanosuit.Draw(shader);
 
@@ -125,6 +134,8 @@ int main()
     glfwTerminate();
     return 0;
 }
+
+
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------

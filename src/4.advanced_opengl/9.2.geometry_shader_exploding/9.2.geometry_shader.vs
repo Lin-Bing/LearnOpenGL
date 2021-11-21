@@ -2,6 +2,7 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 2) in vec2 aTexCoords;
 
+// 接口块，给gs输出纹理坐标
 out VS_OUT {
     vec2 texCoords;
 } vs_out;

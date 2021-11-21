@@ -262,7 +262,7 @@ int main()
         glBindVertexArray(0);
 
         // 绘制天空盒
-        // 注：最后渲染天空盒子，提前深度测试优化性能，天空盒深度缓冲值为1，因此需改为<=1时通过测试，否则丢弃片段
+        // 注：最后渲染天空盒子，提前深度测试优化性能，天空盒深度缓冲值为1.0，最大深度值，只要它前面有一个物体，深度测试就会失败。需改为<=1时通过测试，否则丢弃片段
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         // 设置观察、投影矩阵，为何不需要模型矩阵？？？
