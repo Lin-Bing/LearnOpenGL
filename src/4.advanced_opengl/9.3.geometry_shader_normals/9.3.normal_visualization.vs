@@ -11,6 +11,9 @@ uniform mat4 model;
 
 void main()
 {
+    // ???
+    
+    // 法线矩阵，变换为裁剪空间法向量
     mat3 normalMatrix = mat3(transpose(inverse(view * model)));
     vs_out.normal = vec3(vec4(normalMatrix * aNormal, 0.0));
     gl_Position = view * model * vec4(aPos, 1.0); 

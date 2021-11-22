@@ -86,7 +86,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 绘制4个点 GL_POINTS
+        // 绘制4个点 GL_POINTS，js会转化为绘制三角形
         // draw points
         shader.use();
         glBindVertexArray(VAO);

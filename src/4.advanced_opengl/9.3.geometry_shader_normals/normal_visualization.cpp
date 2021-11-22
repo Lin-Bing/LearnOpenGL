@@ -83,6 +83,7 @@ int main()
     // -----------
     // 图像加载时翻转y轴,避免图像颠倒
     stbi_set_flip_vertically_on_load(true);
+    // 加载模型
     Model backpack(FileSystem::getPath("resources/objects/backpack/backpack.obj"));
 
     // render loop
