@@ -53,6 +53,7 @@ int main()
     Shader shader("10.1.instancing.vs", "10.1.instancing.fs");
 
     // generate a list of 100 quad locations/translation-vectors
+    // 构建偏移向量数组，用于构建100个从(-0.9,-0.9)到(0.9,0.9)的偏移向量
     // ---------------------------------------------------------
     glm::vec2 translations[100];
     int index = 0;
@@ -69,6 +70,7 @@ int main()
     }
 
     // store instance data in an array buffer
+    // 复制translations到缓冲中
     // --------------------------------------
     unsigned int instanceVBO;
     glGenBuffers(1, &instanceVBO);
@@ -77,7 +79,9 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
+    // 配置方形缓冲
     // ------------------------------------------------------------------
+    // 方形顶点属性：位置、颜色
     float quadVertices[] = {
         // positions     // colors
         -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
@@ -92,6 +96,7 @@ int main()
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
     glBindVertexArray(quadVAO);
+    // 复制方形顶点属性到缓冲中，配置解析方式
     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
@@ -99,6 +104,13 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
     // also set instance data
+    // 配置顶点属性 aOffset偏移向量
+    /*
+     实例化数组：它被定义为一个顶点属性，仅在顶点着色器渲染一个新的实例时才会更新
+     glVertexAttribDivisor
+     参数1 顶点属性
+     参数2 属性除数，默认是0：OpenGL在顶点着色器的每次迭代时更新顶点属性；1：OpenGL在渲染一个新实例的时候更新顶点属性；2：每2个实例更新一次属性
+     */
     glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
@@ -118,6 +130,7 @@ int main()
         // draw 100 instanced quads
         shader.use();
         glBindVertexArray(quadVAO);
+        // 注意不是glDrawArrays，而是实例化渲染。最后一个参数为实例数量
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100); // 100 triangles of 6 vertices each
         glBindVertexArray(0);
 

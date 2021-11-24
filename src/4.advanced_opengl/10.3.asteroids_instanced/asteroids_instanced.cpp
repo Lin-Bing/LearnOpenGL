@@ -75,17 +75,20 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // build and compile shaders
+    // 创建着色器： 岩石、大行星
     // -------------------------
     Shader asteroidShader("10.3.asteroids.vs", "10.3.asteroids.fs");
     Shader planetShader("10.3.planet.vs", "10.3.planet.fs");
 
     // load models
     // -----------
+    // 创建模型：
     Model rock(FileSystem::getPath("resources/objects/rock/rock.obj"));
     Model planet(FileSystem::getPath("resources/objects/planet/planet.obj"));
 
     // generate a large list of semi-random model transformation matrices
     // ------------------------------------------------------------------
+    // 构建10w个小行星的模型矩阵
     unsigned int amount = 100000;
     glm::mat4* modelMatrices;
     modelMatrices = new glm::mat4[amount];
@@ -119,6 +122,7 @@ int main()
 
     // configure instanced array
     // -------------------------
+    // 复制小行星模型矩阵数据到缓冲中。即实例化数组
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -128,6 +132,10 @@ int main()
     // note: we're cheating a little by taking the, now publicly declared, VAO of the model's mesh(es) and adding new vertexAttribPointers
     // normally you'd want to do this in a more organized fashion, but for learning purposes this will do.
     // -----------------------------------------------------------------------------------------------------------------------------------
+    /*
+     通过实例化数组，配置小行星顶点属性值
+     由于顶点属性最大允许的数据大小等于一个vec4，而一个mat4本质上是4个vec4。因此需要为这个矩阵预留4个顶点属性。因为我们将它的位置值设置为3，矩阵每一列的顶点属性位置值就是3、4、5和6
+     */
     for (unsigned int i = 0; i < rock.meshes.size(); i++)
     {
         unsigned int VAO = rock.meshes[i].VAO;
@@ -179,6 +187,7 @@ int main()
         planetShader.setMat4("projection", projection);
         planetShader.setMat4("view", view);
         
+        // 绘制行星
         // draw planet
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
@@ -186,11 +195,13 @@ int main()
         planetShader.setMat4("model", model);
         planet.Draw(planetShader);
 
+        // 绘制10w个小行星：由于Model对象Draw底层其实就是遍历Mesh依次调用glDrawElements，此处需要调用实例化渲染API，因此这里直接写，不调用Draw
         // draw meteorites
         asteroidShader.use();
-        asteroidShader.setInt("texture_diffuse1", 0);
+        asteroidShader.setInt("texture_diffuse1", 0); // 绑定纹理，只需设置依次，不用放在循环
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, rock.textures_loaded[0].id); // note: we also made the textures_loaded vector public (instead of private) from the model class.
+        // 遍历Mesh，执行实例化渲染 glDrawElementsInstanced
         for (unsigned int i = 0; i < rock.meshes.size(); i++)
         {
             glBindVertexArray(rock.meshes[i].VAO);

@@ -79,12 +79,14 @@ int main()
     Shader shader("10.2.instancing.vs", "10.2.instancing.fs");
 
     // load models
+    // 加载模型：岩石、行星
     // -----------
     Model rock(FileSystem::getPath("resources/objects/rock/rock.obj"));
     Model planet(FileSystem::getPath("resources/objects/planet/planet.obj"));
 
     // generate a large list of semi-random model transformation matrices
     // ------------------------------------------------------------------
+    // 构建1000个小行星的模型矩阵，让其随机分布在一个圆形平面附件，形成圆环
     unsigned int amount = 1000;
     glm::mat4* modelMatrices;
     modelMatrices = new glm::mat4[amount];
@@ -95,20 +97,25 @@ int main()
     {
         glm::mat4 model = glm::mat4(1.0f);
         // 1. translation: displace along circle with 'radius' in range [-offset, offset]
+        // 角度
         float angle = (float)i / (float)amount * 360.0f;
+        // 随机位移 = (0, 500) / 100.0f - 2.5f = (-2.5, 2.5)
         float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        // x = (-1, 1) * 半径 + 随机位移
         float x = sin(angle) * radius + displacement;
+        // y = 随机位移 * 0.4f = (-1.0, 1.0);
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
         float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
+        // z = (1, -1) * 半径 + 随机位移
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
         float z = cos(angle) * radius + displacement;
         model = glm::translate(model, glm::vec3(x, y, z));
 
-        // 2. scale: Scale between 0.05 and 0.25f
+        // 2.缩放 scale: Scale between 0.05 and 0.25f
         float scale = (rand() % 20) / 100.0f + 0.05;
         model = glm::scale(model, glm::vec3(scale));
 
-        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+        // 3.旋转 rotation: add random rotation around a (semi)randomly picked rotation axis vector
         float rotAngle = (rand() % 360);
         model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
@@ -141,7 +148,8 @@ int main()
         shader.use();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-
+        
+        // 绘制行星
         // draw planet
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
@@ -149,6 +157,7 @@ int main()
         shader.setMat4("model", model);
         planet.Draw(shader);
 
+        // 绘制1000个岩石
         // draw meteorites
         for (unsigned int i = 0; i < amount; i++)
         {
