@@ -14,6 +14,8 @@
 #include <iostream>
 
 /*
+ 帧缓冲
+ 
  附件是一个内存位置，它能够作为帧缓冲的一个缓冲，可以将它想象为一个图像。当创建一个附件的时候我们有两个选项：纹理或渲染缓冲对象(Renderbuffer Object)
  
  demo：将场景渲染到一个附加到帧缓冲对象上的颜色纹理中，之后将在一个横跨整个屏幕的四边形上绘制这个纹理，这样视觉输出和没使用帧缓冲时是完全一样的，但这次是打印到了一个四边形上。
@@ -86,7 +88,7 @@ int main()
     // 加载着色器
     // -------------------------
     Shader shader("5.1.framebuffers.vs", "5.1.framebuffers.fs"); // 箱子、地板
-    Shader screenShader("5.1.framebuffers_screen.vs", "5.1.framebuffers_screen.fs"); // 渲染缓冲区读取的纹理的着色器
+    Shader screenShader("5.1.framebuffers_screen.vs", "5.1.framebuffers_screen.fs"); // 渲染缓冲区读取纹理的着色器
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -217,7 +219,7 @@ int main()
     // 绑定帧缓冲，绑定到GL_FRAMEBUFFER之后所有的读取和写入帧缓冲的操作将会影响当前绑定的帧缓冲
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     
-    // 创建纹理附件，作为颜色附件
+    // 1.创建纹理附件，作为颜色附件
     // create a color attachment texture
     // 创建、绑定
     unsigned int textureColorbuffer;
@@ -237,7 +239,7 @@ int main()
      */
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
     
-    // 创建渲染缓冲对象rbo，作为深度、模板附件
+    // 2.创建渲染缓冲对象rbo，作为深度、模板附件
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     // 创建、绑定
     unsigned int rbo;
@@ -253,7 +255,7 @@ int main()
     // 把渲染缓冲对象附加到帧缓冲上
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
     
-    // 检查帧缓冲是否是完整
+    // 3.检查帧缓冲是否是完整
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;

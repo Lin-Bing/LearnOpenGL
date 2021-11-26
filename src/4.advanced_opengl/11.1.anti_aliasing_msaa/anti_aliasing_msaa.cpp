@@ -32,6 +32,19 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+
+/*
+ SSMA 超采样抗锯齿
+ 原理：使用比正常分辨率更高的分辨率（即超采样）来渲染场景，当图像输出在帧缓冲中更新时，分辨率会被下采样(Downsample)至正常的分辨率。这些额外的分辨率会被用来防止锯齿边缘的产生。
+ 问题：比平时要绘制更多的片段，它也会带来很大的性能开销
+
+ MASS 多重采样抗锯齿
+ 原理：将单一的采样点变为N个采样点，但不会运行片段着色器N次，而是只运行一次片段着色器。最终的颜色值是N个采样点颜色的平均值(没有覆盖的采样点是无色，因此最终颜色只会变淡)，颜色缓冲中所有的图元边缘将会产生一种更平滑的图形。
+ 
+ 把1、2两句代码注释掉，运行后放大图片，可发现方形边缘有锯齿；
+ 打开后就平滑了，没有锯齿
+ */
+
 int main()
 {
     // glfw: initialize and configure
@@ -40,6 +53,14 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
+    /*
+     1.配置窗口系统使用包含4个样本的多重采样缓冲
+     
+     调用glfwCreateWindow创建渲染窗口时，每个屏幕坐标就会使用一个包含4个子采样点的颜色缓冲了。
+     GLFW会自动创建一个每像素4个子采样点的深度和样本缓冲。这也意味着所有缓冲的大小都增长了4倍
+     */
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -73,6 +94,9 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    /*
+     2.启用多重采样
+     */
     glEnable(GL_MULTISAMPLE); // enabled by default on some drivers, but not all so always enable to make sure
 
     // build and compile shaders
