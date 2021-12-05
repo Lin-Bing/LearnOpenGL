@@ -77,12 +77,14 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // build and compile shaders
+    // 着色器
     // -------------------------
-    Shader shader("6.2.cubemaps.vs", "6.2.cubemaps.fs");
-    Shader skyboxShader("6.2.skybox.vs", "6.2.skybox.fs");
+    Shader shader("6.2.cubemaps.vs", "6.2.cubemaps.fs");   // 箱子
+    Shader skyboxShader("6.2.skybox.vs", "6.2.skybox.fs"); // 天空盒
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    // 箱子顶点属性：位置、法向量
     float cubeVertices[] = {
         // positions          // normals
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -127,6 +129,7 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
+    // 天空盒顶点属性：位置，由于是立方体纹理贴图 顶点位置坐标就是纹理坐标
     float skyboxVertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -172,6 +175,7 @@ int main()
          1.0f, -1.0f,  1.0f
     };
 
+    // 箱子顶点缓冲设置
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -183,6 +187,8 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    
+    // 天空盒顶点缓冲设置
     // skybox VAO
     unsigned int skyboxVAO, skyboxVBO;
     glGenVertexArrays(1, &skyboxVAO);
@@ -193,6 +199,7 @@ int main()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+    // 加载纹理：天空盒纹理，由于箱子颜色通过反射从天空盒采样，因此不需要箱子纹理
     // load textures
     // -------------
     vector<std::string> faces
@@ -206,14 +213,15 @@ int main()
     };
     unsigned int cubemapTexture = loadCubemap(faces);
 
+    // 箱子、天空盒着色器都绑定天空盒立方体贴图的纹理
     // shader configuration
     // --------------------
     shader.use();
     shader.setInt("skybox", 0);
-
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
+    
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -233,6 +241,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // 绘制箱子
         // draw scene as normal
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
@@ -241,14 +250,16 @@ int main()
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
+        // 绑定相机位置，用于fs计算反射向量，采样立方体纹理贴图
         shader.setVec3("cameraPos", camera.Position);
         // cubes
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture); // 注意箱子绑定的是立方体贴图纹理
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
+        // 绘制天空盒
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use();
@@ -372,6 +383,7 @@ unsigned int loadTexture(char const * path)
     return textureID;
 }
 
+// 加载立方体贴图纹理
 // loads a cubemap texture from 6 individual texture faces
 // order:
 // +X (right)
