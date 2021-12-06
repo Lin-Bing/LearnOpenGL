@@ -58,15 +58,17 @@ void Game::Init()
     this->Levels.push_back(four);
     this->Level = 0;
     // configure game objects
+    // 挡板
     glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
     Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
+    // 球初始位置在挡板中央
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
     Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("face"));
 }
 
 void Game::Update(float dt)
 {
-    // update objects
+    // update objects 移动球
     Ball->Move(dt, this->Width);
      // check for collisions
     this->DoCollisions();
