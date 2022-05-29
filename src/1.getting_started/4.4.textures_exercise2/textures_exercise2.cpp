@@ -7,6 +7,10 @@
 
 #include <iostream>
 
+/* cp
+ 测试纹理环绕方式
+ */
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -53,6 +57,9 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    /* cp
+     这里把纹理坐标设置为2.0，会导值纹理不够大，需要使用纹理环绕
+     */
     float vertices[] = {
         // positions          // colors           // texture coords (note that we changed them to 2.0f!)
          0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
@@ -96,6 +103,9 @@ int main()
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
     // set the texture wrapping parameters
+    /* cp
+     纹理环绕：GL_CLAMP_TO_EDGE
+     */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // note that we set the container wrapping method to GL_CLAMP_TO_EDGE
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // set texture filtering parameters
@@ -121,6 +131,9 @@ int main()
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping parameters
+    /* cp
+     纹理环绕：GL_REPEAT
+     */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// we want to repeat the awesomeface pattern so we kept it at GL_REPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters

@@ -224,7 +224,10 @@ int main()
         float radius = 10.0f;
         float camX   = sin(glfwGetTime()) * radius;
         float camZ   = cos(glfwGetTime()) * radius;
-        view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        
+        std::cout << "camX:" << camX << ", camZ:" << camZ << std::endl;
+        // 位置：旋转摄像机；  目标：保持注视原点；  up向量：y方向；
+        view = view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("view", view);
 
         // render boxes

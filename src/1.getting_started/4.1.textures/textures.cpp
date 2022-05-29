@@ -52,6 +52,7 @@ int main()
     Shader ourShader("4.1.texture.vs", "4.1.texture.fs"); 
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
+    // -0.5~0.5，占据标准空间坐标(-1.0,1.0)的一半
     // ------------------------------------------------------------------
     float vertices[] = {
         // positions          // colors           // texture coords

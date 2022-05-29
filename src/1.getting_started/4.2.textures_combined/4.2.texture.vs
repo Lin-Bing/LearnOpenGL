@@ -10,5 +10,9 @@ void main()
 {
 	gl_Position = vec4(aPos, 1.0);
 	ourColor = aColor;
-	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+	
+    TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+    
+    // 着色器中翻转y值，作用和stbi_set_flip_vertically_on_load一样
+    // TexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);
 }

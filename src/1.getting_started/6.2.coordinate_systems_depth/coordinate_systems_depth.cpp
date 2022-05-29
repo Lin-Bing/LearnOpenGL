@@ -53,6 +53,7 @@ int main()
 
     // configure global opengl state
     // -----------------------------
+    // 开启深度测试
     glEnable(GL_DEPTH_TEST);
 
     // build and compile our shader zprogram
@@ -61,6 +62,7 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    // 6个面需要 6*6个顶点
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -190,6 +192,7 @@ int main()
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // 清除颜色缓冲、深度缓冲
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
 
         // bind textures on corresponding texture units
@@ -205,7 +208,10 @@ int main()
         glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 view          = glm::mat4(1.0f);
         glm::mat4 projection    = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+        // 模型矩阵：沿(0.5, 0.5)方向，顺时针旋转55度
+//        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(0.5f, 0.5f, 0.0f));
+        // 模型矩阵：沿(0.5, 0.5)方向，根据时间旋转
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 0.5f, 0.0f));
         view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         // retrieve the matrix uniform locations
