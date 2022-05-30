@@ -18,7 +18,7 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera 摄像机通常从z轴，看向z轴负方向
+// camera 摄像机通常从z轴>0位置，看向z轴负方向
 // 位置
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 // 从位置出发，看向前面cameraFront方向，可以推出目标位置DestPos = cameraPos + cameraFront;
@@ -236,7 +236,8 @@ int main()
 
         // activate shader
         ourShader.use();
-
+        
+        // 相机lookAt矩阵作为视觉矩阵
         // camera/view transformation
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         ourShader.setMat4("view", view);
@@ -279,13 +280,18 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float cameraSpeed = 2.5 * deltaTime; 
+    float cameraSpeed = 2.5 * deltaTime;
+    
+    // 键盘按W，相机前移，即往相机方向注视的焦点cameraFront移动。实际上是等于cameraPos z值减小（注意之类cameraFront的z分量是负值，加法即是减小）
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
+    // 键盘按S，相机后移
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         cameraPos -= cameraSpeed * cameraFront;
+    // 键盘按A，左移，因此减去n个x方向单位向量
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    // 键盘按D，右移，因此加上n个x方向单位向量
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
