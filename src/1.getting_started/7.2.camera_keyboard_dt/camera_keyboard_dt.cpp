@@ -18,9 +18,12 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera
+// camera 摄像机通常从z轴，看向z轴负方向
+// 位置
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+// 从位置出发，看向前面cameraFront方向，可以推出目标位置DestPos = cameraPos + cameraFront;
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+// 向上方向
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 // timing
