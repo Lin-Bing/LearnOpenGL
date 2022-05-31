@@ -20,16 +20,21 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera
+// camera 摄像机通常从z轴>0位置，看向z轴负方向
+// 位置
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
+// 从位置出发，看向前面cameraFront方向，可以推出目标位置DestPos = cameraPos + cameraFront;
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
 
+// 俯仰角、偏航角，通过鼠标移动来控制目标方向cameraFront
 bool firstMouse = true;
 float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch =  0.0f;
 float lastX =  800.0f / 2.0;
 float lastY =  600.0 / 2.0;
+
+// 视野fov通过鼠标滚动来控制透视投影矩阵
 float fov   =  45.0f;
 
 // timing
@@ -313,6 +318,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+    // 第一次获取焦点（鼠标初次移入窗口），初始化历史位置鼠标位置(lastX,lastY)
     if (firstMouse)
     {
         lastX = xpos;
@@ -320,6 +326,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         firstMouse = false;
     }
 
+    // 计算位置偏移量：xoffset、yoffset
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
     lastX = xpos;
@@ -328,16 +335,19 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     float sensitivity = 0.1f; // change this value to your liking
     xoffset *= sensitivity;
     yoffset *= sensitivity;
-
+    
+    // 计算角度偏移量：xoffset为偏航角yaw偏移，yoffset为俯仰角pitch偏移
     yaw += xoffset;
     pitch += yoffset;
-
+    
+    // 俯仰角限制，小于90度，保证最多只能看到天空和脚下
     // make sure that when pitch is out of bounds, screen doesn't get flipped
     if (pitch > 89.0f)
         pitch = 89.0f;
     if (pitch < -89.0f)
         pitch = -89.0f;
-
+    
+    // 通过俯仰角、偏航角计算方向向量，标准化
     glm::vec3 front;
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     front.y = sin(glm::radians(pitch));

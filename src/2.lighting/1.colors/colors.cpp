@@ -30,7 +30,7 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-// lighting
+// lighting 原始x>1，所以看不到，要缩小才看到
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main()
@@ -75,6 +75,7 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    // 物体、光源着色器
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightingShader("1.colors.vs", "1.colors.fs");
@@ -125,6 +126,7 @@ int main()
         -0.5f,  0.5f,  0.5f, 
         -0.5f,  0.5f, -0.5f, 
     };
+    // 配置盒子的顶点信息 VAO
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
@@ -139,11 +141,13 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // 配置光源的顶点信息 lightCubeVAO
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);
     glBindVertexArray(lightCubeVAO);
 
+    // 光源使用物体的顶点信息，由于VBO已经有值，无需再调用glBufferData填充数据，直接使用
     // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -170,17 +174,20 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        // 1.绘制物体：配置着色器、绘制
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         lightingShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
 
+        // view/projection使用相机变换
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
-
+        
+        // 位置放到原点
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
@@ -190,10 +197,12 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
+        // 2.绘制光源：配置着色器、绘制
         // also draw the lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
+        // 位置放到lightPos，缩小为原来的0.2
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
