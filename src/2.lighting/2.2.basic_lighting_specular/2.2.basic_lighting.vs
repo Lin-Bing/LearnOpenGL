@@ -11,7 +11,9 @@ uniform mat4 projection;
 
 void main()
 {
+    // 在世界空间中做所有光照计算，因此顶点先乘以模型矩阵，变换到世界空间
     FragPos = vec3(model * vec4(aPos, 1.0));
+    // 法线也需要变换但世界空间，但不是简单乘以模型矩阵，需要用法线矩阵
     Normal = mat3(transpose(inverse(model))) * aNormal;  
     
     gl_Position = projection * view * vec4(FragPos, 1.0);

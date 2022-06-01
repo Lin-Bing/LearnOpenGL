@@ -1,16 +1,23 @@
 #version 330 core
 out vec4 FragColor;
 
+// 物体材质：原本三个分量都是一个颜色，现在使用三个颜色来描述
 struct Material {
+    // ambient、diffuse一般是物体颜色
     vec3 ambient;
     vec3 diffuse;
-    vec3 specular;    
+    // specular表示镜面高光颜色，一般是接近白色
+    vec3 specular;
+    // 镜面反射指数
     float shininess;
 }; 
 
+// 光的属性
 struct Light {
+    // 光源位置
     vec3 position;
 
+    // 每个颜色分量的强度系数：通常环境光照系数最低、漫反射中等、镜面反射由于要产生高光效果所以强度一般是最大值1.0
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;

@@ -11,6 +11,7 @@ uniform mat4 projection;
 
 void main()
 {
+    // 在世界空间中做所有光照计算，因此顶点先乘以模型矩阵，变换到世界空间
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = aNormal;  
     
