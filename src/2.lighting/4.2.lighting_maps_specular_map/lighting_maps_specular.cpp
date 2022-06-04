@@ -84,7 +84,7 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    // 顶点属性：位置坐标、发现、纹理坐标
+    // 顶点属性：位置坐标、法向量、纹理坐标
     float vertices[] = {
         // positions          // normals           // texture coords
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -165,6 +165,7 @@ int main()
     unsigned int diffuseMap = loadTexture(FileSystem::getPath("resources/textures/container2.png").c_str());
     unsigned int specularMap = loadTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str());
 
+    // 配置纹理采样器对应的纹理单元
     // shader configuration
     // --------------------
     lightingShader.use();
@@ -214,6 +215,7 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
 
+        // 激活纹理单元后，绑定纹理到激活纹理单元
         // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);

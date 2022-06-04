@@ -2,11 +2,15 @@
 out vec4 FragColor;
 
 struct Material {
+    // 漫反射贴图纹理采样器
     sampler2D diffuse;
+    // 镜面光贴图纹理采样器
     sampler2D specular;    
+    // 镜面反射指数
     float shininess;
 }; 
 
+// 光强度系数分量
 struct Light {
     vec3 position;
 
@@ -23,6 +27,7 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
 
+// 环境光照、漫反射、镜面光照都从纹理贴图上获取颜色
 void main()
 {
     // ambient

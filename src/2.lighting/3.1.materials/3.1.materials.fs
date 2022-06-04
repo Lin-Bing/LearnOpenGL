@@ -1,10 +1,11 @@
 #version 330 core
 out vec4 FragColor;
 
-// 物体材质：原本三个分量都是一个颜色，现在使用三个颜色来描述
+// 物体材质：注意不是描述光线，是描述光线作用在物体上，物体的反射颜色，即：已经是最终结果，无需lightColor ✖️ objectColor
 struct Material {
-    // ambient、diffuse一般是物体颜色
+    // ambient 在环境光照下表面反射的颜色，通常与表面的颜色相同
     vec3 ambient;
+    // ambient 在漫反射下表面反射的颜色，通常与表面的颜色相同
     vec3 diffuse;
     // specular表示镜面高光颜色，一般是接近白色
     vec3 specular;
@@ -30,6 +31,8 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
 
+// 思路：根据
+
 void main()
 {
     // ambient
@@ -47,6 +50,7 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.specular * (spec * material.specular);  
         
+    // 三个反射颜色叠加，由于已经是反射颜色，无需lightColor ✖️ objectColor
     vec3 result = ambient + diffuse + specular;
     FragColor = vec4(result, 1.0);
 } 

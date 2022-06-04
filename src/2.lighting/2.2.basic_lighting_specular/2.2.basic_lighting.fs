@@ -9,6 +9,9 @@ uniform vec3 viewPos;  // 观察点
 uniform vec3 lightColor;  // 光线颜色
 uniform vec3 objectColor;
 
+
+// 思路：根据物体颜色是反射光线的原理，最终颜色 = 三个分量的光线颜色之和 ✖️ 物体颜色
+
 void main()
 {
     // ambient

@@ -14,12 +14,13 @@ using namespace std;
 
 #define MAX_BONE_INFLUENCE 4
 
+// 顶点数据
 struct Vertex {
-    // position
+    // position 位置
     glm::vec3 Position;
-    // normal
+    // normal 法线
     glm::vec3 Normal;
-    // texCoords
+    // texCoords 纹理坐标
     glm::vec2 TexCoords;
     // tangent
     glm::vec3 Tangent;
@@ -65,7 +66,7 @@ public:
     // render the mesh 绘制网格
     void Draw(Shader &shader)
     {
-        // 绑定纹理
+        // 激活纹理单元、绑定纹理单元到采样器、绑定纹理
         // bind appropriate textures
         unsigned int diffuseNr  = 1;
         unsigned int specularNr = 1;

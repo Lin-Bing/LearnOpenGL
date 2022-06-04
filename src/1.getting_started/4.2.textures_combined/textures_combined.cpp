@@ -145,6 +145,7 @@ int main()
     }
     stbi_image_free(data);
 
+    // 配置采样器对应的纹理单元
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
     ourShader.use(); // don't forget to activate/use the shader before setting uniforms!
