@@ -73,7 +73,7 @@ int main()
 
     // configure global opengl state
     // 全局配置
-    // 开启深度测试：默认值GL_LESS丢弃大于等于当前深度缓冲值的所有片段
+    // 开启深度测试：默认值GL_LESS，丢弃大于等于当前深度缓冲值的所有片段
     // 开启模板测试：不等于1时通过测试，通过模板&深度测试时，写入模板缓冲
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
@@ -231,7 +231,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
-        // 1.绘制箱子，并写入模板缓冲，把模板缓冲在箱子被绘制的地方的模板值更新为1
+        // 1.绘制箱子，并写入模板缓冲，把模板缓冲在箱子被绘制的区域的模板值更新为1
         // 1st. render pass, draw objects as normal, writing to the stencil buffer
         // --------------------------------------------------------------------
         // 模板测试：GL_ALWAYS：永远通过模板测试，被绘制
