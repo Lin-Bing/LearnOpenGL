@@ -16,10 +16,10 @@ out vec3 fColor;
 
 void build_house(vec4 position)
 {
-    // 输出颜色
+    // 取顶点颜色，作为输出颜色
     fColor = gs_in[0].color; // gs_in[0] since there's only one input vertex
     
-    // 发色顶点，添加5个顶点到图元中，构成一个房子
+    // 发射顶点，添加5个顶点到图元中，构成一个房子
     gl_Position = position + vec4(-0.2, -0.2, 0.0, 0.0); // 1:bottom-left   
     EmitVertex();   
     gl_Position = position + vec4( 0.2, -0.2, 0.0, 0.0); // 2:bottom-right
@@ -29,12 +29,15 @@ void build_house(vec4 position)
     gl_Position = position + vec4( 0.2,  0.2, 0.0, 0.0); // 4:top-right
     EmitVertex();
     gl_Position = position + vec4( 0.0,  0.4, 0.0, 0.0); // 5:top
+    // 将最后一个顶点的颜色设置为白色
     fColor = vec3(1.0, 1.0, 1.0);
     EmitVertex();
+    
     // 所有发射出的(Emitted)顶点都会合成为指定的输出渲染图元
     EndPrimitive();
 }
 
-void main() {    
+void main() {
+    // 取顶点位置
     build_house(gl_in[0].gl_Position);
 }

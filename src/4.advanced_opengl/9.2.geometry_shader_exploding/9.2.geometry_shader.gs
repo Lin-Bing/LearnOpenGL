@@ -29,7 +29,7 @@ vec3 GetNormal()
 // 顶点计算爆炸效果：顶点随着时间沿法向量方向移动
 vec4 explode(vec4 position, vec3 normal)
 {
-    // 位置沿法向量方向移动（0,2），sin取值范围(-1,1),(sin(time) + 1.0) / 2.0 取值范围即(0,1)
+    // 位置沿法向量方向移动（0,2）：sin取值范围(-1,1),(sin(time) + 1.0) / 2.0 取值范围即(0,1)
     float magnitude = 2.0;
     vec3 direction = normal * ((sin(time) + 1.0) / 2.0) * magnitude; 
     return position + vec4(direction, 0.0); // 原始位置值 + 法向量方向移动值，产生爆炸效果

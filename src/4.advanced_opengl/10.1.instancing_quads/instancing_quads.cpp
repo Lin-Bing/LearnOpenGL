@@ -70,7 +70,7 @@ int main()
     }
 
     // store instance data in an array buffer
-    // 复制translations到缓冲中
+    // 批量复制translations到缓冲中
     // --------------------------------------
     unsigned int instanceVBO;
     glGenBuffers(1, &instanceVBO);
@@ -130,7 +130,7 @@ int main()
         // draw 100 instanced quads
         shader.use();
         glBindVertexArray(quadVAO);
-        // 注意不是glDrawArrays，而是实例化渲染。最后一个参数为实例数量
+        // 注意不是glDrawArrays，而是实例化渲染。最后一个参数为实例数量，只需调用一次，GPU根据自动绘制相应数量，每次绘制使用实例化数组中的特定偏移量aOffset。避免频繁通信
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100); // 100 triangles of 6 vertices each
         glBindVertexArray(0);
 

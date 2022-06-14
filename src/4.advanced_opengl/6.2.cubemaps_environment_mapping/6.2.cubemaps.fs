@@ -5,7 +5,7 @@ in vec3 Normal;
 in vec3 Position;
 
 uniform vec3 cameraPos;
-// 箱子片段颜色通过放射从天空盒子采用，因此需要天空盒子的纹理采样器
+// 箱子片段颜色通过反射从天空盒子采样，因此需要天空盒子的纹理采样器
 uniform samplerCube skybox;
 
 void main()

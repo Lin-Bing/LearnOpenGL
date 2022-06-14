@@ -131,7 +131,11 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
     
-    // 天空盒顶点属性：位置，由于是立方体纹理贴图 顶点位置坐标就是纹理坐标
+    /*
+     用于贴图3D立方体的立方体贴图可以使用立方体的位置作为纹理坐标来采样。
+     当立方体处于原点(0, 0, 0)时，它的每一个位置向量都是从原点出发的方向向量。这个方向向量正是获取立方体上特定位置的纹理值所需要的。
+     正是因为这个，我们只需要提供位置向量而不用纹理坐标了。
+     */
     float skyboxVertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -265,8 +269,15 @@ int main()
         // 注：最后渲染天空盒子，提前深度测试优化性能，天空盒深度缓冲值为1.0，最大深度值，只要它前面有一个物体，深度测试就会失败。需改为<=1时通过测试，否则丢弃片段
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-        // 设置观察、投影矩阵，为何不需要模型矩阵？？？
+        // 设置观察、投影矩阵，为何不需要模型矩阵？？？因为已经是标准坐标？？？
         skyboxShader.use();
+        /*
+        注意：
+         我们希望天空盒是以玩家为中心的，这样不论玩家移动了多远，天空盒都不会变近，让玩家产生周围环境非常大的印象。
+         然而，当前的观察矩阵会旋转、缩放和位移来变换天空盒的所有位置，所以当玩家移动的时候，立方体贴图也会移动！我们希望移除观察矩阵中的位移部分，让移动不会影响天空盒的位置向量
+         由于4*4变换矩阵中，位移部分在矩阵第4列，因此可以通过把矩阵转化为3*3，再转化回4*4来删除位移效果。保留旋转，去除位移
+         */
+//        view = camera.GetViewMatrix();
         view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
         skyboxShader.setMat4("view", view);
         skyboxShader.setMat4("projection", projection);

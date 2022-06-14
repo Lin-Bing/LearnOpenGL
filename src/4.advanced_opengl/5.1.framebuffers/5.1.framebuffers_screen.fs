@@ -10,18 +10,20 @@ const float offset = 1.0 / 300.0;
 void main()
 {
     // 普通效果
-    // vec3 col = texture(screenTexture, TexCoords).rgb; // 从纹理中采样
-    // FragColor = vec4(col, 1.0);
+    //*
+    vec3 col = texture(screenTexture, TexCoords).rgb; // 从纹理中采样
+    FragColor = vec4(col, 1.0);
+    //*/
     
     // 反相效果：对颜色取反
     // FragColor = vec4(vec3(1.0 - texture(screenTexture, TexCoords)), 1.0);
     
     // 灰度：移除场景中除了黑白灰以外所有的颜色，取所有的颜色分量，将它们平均化
-    
+    /*
     FragColor = texture(screenTexture, TexCoords);
     float average = (FragColor.r + FragColor.g + FragColor.b) / 3.0;
     FragColor = vec4(average, average, average, 1.0);
-    
+    */
     
     
     // 锐化运行奔溃？？？

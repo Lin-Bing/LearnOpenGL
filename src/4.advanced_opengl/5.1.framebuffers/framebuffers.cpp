@@ -88,7 +88,7 @@ int main()
     // 加载着色器
     // -------------------------
     Shader shader("5.1.framebuffers.vs", "5.1.framebuffers.fs"); // 箱子、地板
-    Shader screenShader("5.1.framebuffers_screen.vs", "5.1.framebuffers_screen.fs"); // 渲染缓冲区读取纹理的着色器
+    Shader screenShader("5.1.framebuffers_screen.vs", "5.1.framebuffers_screen.fs"); // 从离屏帧缓冲区读取纹理的着色器
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -149,7 +149,7 @@ int main()
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
     
-    // 离屏渲染缓冲区读取的纹理，在标准化设备坐标中填充整个屏幕的四边形的顶点属性。
+    // 从离屏渲染帧缓冲中读取的纹理，在标准化设备坐标中填充整个屏幕的四边形的顶点属性。
     float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
         // positions   // texCoords
         -1.0f,  1.0f,  0.0f, 1.0f,
@@ -185,7 +185,7 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    // 离屏帧缓冲产物 配置顶点属性缓冲
+    // 离屏渲染产物 即方形图 配置顶点属性缓冲
     // screen quad VAO
     unsigned int quadVAO, quadVBO;
     glGenVertexArrays(1, &quadVAO);
@@ -255,7 +255,7 @@ int main()
     // 把渲染缓冲对象附加到帧缓冲上
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
     
-    // 3.检查帧缓冲是否是完整
+    // 3.检查帧缓冲是否是完整，暂时解绑
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
@@ -304,7 +304,7 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        // cubes 渲染箱子
+        // cubes 渲染2个箱子到不同位置
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
@@ -322,7 +322,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
-        // 2.绑定回默认缓冲，让渲染操作作用到屏幕缓冲，并绘制带有自定义帧缓冲颜色纹理的四边形
+        // 2.绑定回默认缓冲，让渲染操作作用到屏幕缓冲，并绘制自定义帧缓冲的颜色纹理的四边形
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // 禁用深度测试，绘制四边形不需要关心深度测试，绘制普通场景时会重新开启

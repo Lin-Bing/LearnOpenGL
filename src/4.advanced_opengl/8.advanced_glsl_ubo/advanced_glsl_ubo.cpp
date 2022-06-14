@@ -74,7 +74,7 @@ int main()
 
     
     // build and compile shaders
-    // 定义四个着色器：vs相同，fs不同
+    // 定义四个着色器用于绘制4个颜色的立方体：vs相同，fs不同
     // -------------------------
     Shader shaderRed("8.advanced_glsl.vs", "8.red.fs");
     Shader shaderGreen("8.advanced_glsl.vs", "8.green.fs");
@@ -201,7 +201,7 @@ int main()
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        // 画4个物体在4个角。他们的投影和观察矩阵是一样的，模型矩阵不一样
+        // 画4个物体在4个角。他们的投影、观察矩阵是一样的，模型矩阵不一样。因此前者放在uniform缓冲对象中复用，后者不是
         // draw 4 cubes 
         // RED
         glBindVertexArray(cubeVAO);
