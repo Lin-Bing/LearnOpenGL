@@ -81,6 +81,21 @@ int main()
     // ------------------------------------
     Shader lightingShader("4.1.lighting_maps.vs", "4.1.lighting_maps.fs");
     Shader lightCubeShader("4.1.light_cube.vs", "4.1.light_cube.fs");
+    
+    // 根据uniform变量的index，查找变量的名称、是否为数组(以及数组长度)、变量类型
+    GLint num_uniforms;
+    glGetProgramiv(lightingShader.ID, GL_ACTIVE_UNIFORMS, &num_uniforms);
+    GLchar uniform_name[256];
+    GLsizei length;
+    GLint size;
+    GLenum type;
+    for (int i = 0; i < num_uniforms; i++)
+    {
+        glGetActiveUniform(lightingShader.ID, i, sizeof(uniform_name), &length, &size, &type, uniform_name);
+        printf("uniform: %d, name:%20s, lenth:%d, size:%d, type:%x \n", i, uniform_name, length, size, type);
+        // ... save this uniform data so it can be used during rendering
+    }
+
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
