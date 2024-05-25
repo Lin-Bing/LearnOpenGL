@@ -205,7 +205,8 @@ int main()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-    // 加载纹理
+    /* cp 加载纹理
+     */
     // load textures
     // -------------
     // 箱子纹理
@@ -249,7 +250,8 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 绘制箱子
+        /* cp 先绘制其他物体
+         */
         // draw scene as normal
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
@@ -265,11 +267,13 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
-        // 绘制天空盒
-        // 注：最后渲染天空盒子，提前深度测试优化性能，天空盒深度缓冲值为1.0，最大深度值，只要它前面有一个物体，深度测试就会失败。需改为<=1时通过测试，否则丢弃片段
+        /* cp 最后绘制天空盒
+         注：最后渲染天空盒子，提前深度测试优化性能，天空盒深度缓冲值为1.0，最大深度值，只要它前面有一个物体，深度测试就会失败。
+         需改为<=1时通过测试，因为：当第一帧渲染后，深度缓冲中天空盒子的部分是1，移动场景时，新的天空盒子片段必须覆盖旧的天空盒子片段，因此=1时必须通过测试
+         */
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-        // 设置观察、投影矩阵，为何不需要模型矩阵？？？因为已经是标准坐标？？？
+        // 设置观察、投影矩阵。不需要模型矩阵，因为顶点坐标是标准坐标
         skyboxShader.use();
         /*
         注意：

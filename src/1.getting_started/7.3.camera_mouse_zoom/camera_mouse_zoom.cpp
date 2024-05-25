@@ -16,6 +16,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+/* cp
+ AWSD调整相机位置，从不同位置看场景
+ 鼠标调整相机方向，看向场景中不同位置
+ 两者结合就可以看整个场景
+ */
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -293,7 +299,9 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
+    
+    /* cp AWSD改变相机位置
+     */
     float cameraSpeed = 2.5 * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
@@ -318,6 +326,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+    /* cp 鼠标移动，改变相机注视方向：移动x方向改变偏航角yaw，移动y方向改变俯仰角pitch
+     */
     // 第一次获取焦点（鼠标初次移入窗口），初始化历史位置鼠标位置(lastX,lastY)
     if (firstMouse)
     {
@@ -359,6 +369,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+    /* cp 鼠标滚动，改变视野大小（投影矩阵）
+     */
     fov -= (float)yoffset;
     if (fov < 1.0f)
         fov = 1.0f;

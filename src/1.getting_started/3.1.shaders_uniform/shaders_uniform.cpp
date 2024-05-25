@@ -144,7 +144,9 @@ int main()
 
         // be sure to activate the shader before any calls to glUniform
         glUseProgram(shaderProgram);
-
+        
+        /* cp 更新着色器Uniform全局变量 ourColor
+         */
         // update shader uniform
         float timeValue = glfwGetTime();
         float greenValue = sin(timeValue) / 2.0f + 0.5f;

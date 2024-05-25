@@ -2,7 +2,7 @@
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec3 aColor;
 
-// 接口块（Interface Block），用于着色器之间参数传递
+// 接口块（Interface Block），用于着色器之间参数传递。这里传递给下一个着色器：几何着色器
 out VS_OUT {
     vec3 color;
 } vs_out;

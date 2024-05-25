@@ -122,7 +122,8 @@ int main()
 
     // configure instanced array
     // -------------------------
-    // 复制小行星模型矩阵数据到缓冲中。即实例化数组
+    /* cp 复制小行星模型矩阵数据到缓冲中。即实例化数组
+     */
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -132,8 +133,8 @@ int main()
     // note: we're cheating a little by taking the, now publicly declared, VAO of the model's mesh(es) and adding new vertexAttribPointers
     // normally you'd want to do this in a more organized fashion, but for learning purposes this will do.
     // -----------------------------------------------------------------------------------------------------------------------------------
-    /*
-     通过实例化数组，配置小行星顶点属性值
+    /* cp
+     通过实例化数组，配置小行星顶点属性值。glVertexAttribDivisor每个实例配置一次
      由于顶点属性最大允许的数据大小等于一个vec4，而一个mat4本质上是4个vec4。因此需要为这个矩阵预留4个顶点属性。因为我们将它的位置值设置为3，矩阵每一列的顶点属性位置值就是3、4、5和6
      */
     for (unsigned int i = 0; i < rock.meshes.size(); i++)
@@ -201,7 +202,8 @@ int main()
         asteroidShader.setInt("texture_diffuse1", 0); // 绑定纹理，只需设置依次，不用放在循环
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, rock.textures_loaded[0].id); // note: we also made the textures_loaded vector public (instead of private) from the model class.
-        // 遍历Mesh，执行实例化渲染 glDrawElementsInstanced
+        /* cp 遍历Mesh，执行实例化渲染 glDrawElementsInstanced
+         */
         for (unsigned int i = 0; i < rock.meshes.size(); i++)
         {
             glBindVertexArray(rock.meshes[i].VAO);

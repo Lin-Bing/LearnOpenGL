@@ -83,7 +83,9 @@ int main()
 
     // build and compile shaders
     // -------------------------
+    // 生成深度贴图的着色器
     Shader simpleDepthShader("3.1.1.shadow_mapping_depth.vs", "3.1.1.shadow_mapping_depth.fs");
+    // 把深度贴图绘制出来（可视化）的着色器
     Shader debugDepthQuad("3.1.1.debug_quad.vs", "3.1.1.debug_quad_depth.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -117,11 +119,18 @@ int main()
     // -------------
     unsigned int woodTexture = loadTexture(FileSystem::getPath("resources/textures/wood.png").c_str());
 
+    /* cp 配置帧缓冲，用于生成深度纹理贴图，即从光的视角生成的深度缓冲
+     */
     // configure depth map FBO
     // -----------------------
+    // 创建帧缓冲
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     unsigned int depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
+    /*
+     创建纹理
+     由于是存储深度，存储格式从GL_RGB变为GL_DEPTH_COMPONENT，源图格式从GL_UNSIGNED_BYTE变为GL_DEPTH_COMPONENT
+     */
     // create depth texture
     unsigned int depthMap;
     glGenTextures(1, &depthMap);
@@ -131,6 +140,10 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    /* 添加纹理附件
+     由于是作为深度换从，附件类型改为GL_DEPTH_ATTACHMENT
+     不包含颜色缓冲的帧缓冲对象是不完整的，因此需要通过glDrawBuffer、glReadBuffer读和绘制缓冲设置为GL_NONE显式告诉OpenGL我们不适用任何颜色数据进行渲染
+     */
     // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -167,6 +180,11 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /* cp 1.生成深度贴图到深度贴图帧缓冲depthMapFBO
+         由于是平行光，这里使用正交投影ortho，没有使用透视投影。
+         相机位置是光源位置lightPos
+         lightSpaceMatrix是以光源为视角的 投影矩阵*视觉矩阵，用于把顶点从世界空间变换到以光源为视角的裁剪空间。
+         */
         // 1. render depth of scene to texture (from light's perspective)
         // --------------------------------------------------------------
         glm::mat4 lightProjection, lightView;
@@ -184,13 +202,20 @@ int main()
             glClear(GL_DEPTH_BUFFER_BIT);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, woodTexture);
+            // 绘制地板、箱子，到深度贴图
             renderScene(simpleDepthShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // reset viewport
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+//        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        /* cp 注意：
+         mac属于视网膜显示屏 ，存储到framebuffer viewport 尺寸与framebuffer关联texture2d尺寸相同，但输出到屏幕则viewport尺寸要扩大两倍以适应视网膜显示器
+         */
+        glViewport(0, 0, SCR_WIDTH*2, SCR_HEIGHT*2);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /* cp 2.绘制深度贴图到默认帧缓冲
+         */
         // render Depth map to quad for visual debugging
         // ---------------------------------------------
         debugDepthQuad.use();
@@ -219,11 +244,13 @@ int main()
 // --------------------
 void renderScene(const Shader &shader)
 {
+    // 绘制地板
     // floor
     glm::mat4 model = glm::mat4(1.0f);
     shader.setMat4("model", model);
     glBindVertexArray(planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    // 绘制3个箱子
     // cubes
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
@@ -373,7 +400,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+//    glViewport(0, 0, width, height);
 }
 
 // glfw: whenever the mouse moves, this callback is called

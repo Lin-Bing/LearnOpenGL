@@ -11,6 +11,26 @@
 
 #include <iostream>
 
+void printMatrix(glm::mat4 &mat) {
+    double dArray[4][4] = {0.0};
+    const float *pSource = (const float*)glm::value_ptr(mat);
+    for (int i = 0; i < 16; ++i) {
+        int col = i/4;
+        int row = i%4;
+        dArray[row][col] = pSource[i];
+    }
+    
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<4; j++) {
+            float n = dArray[i][j];
+            printf("%s%.2f ", n>0 ? " ": "", n);
+        }
+        printf("\n");
+    }
+    
+    printf("\n");
+}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -50,6 +70,10 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    
+//    glm::mat4 view1          = glm::mat4(1.0f);
+//    view1       = glm::translate(view1, glm::vec3(1.0f, 2.0f, -3.0f));
+//    printMatrix(view1);
 
     // configure global opengl state
     // -----------------------------
@@ -225,14 +249,18 @@ int main()
         float camX   = sin(glfwGetTime()) * radius;
         float camZ   = cos(glfwGetTime()) * radius;
         
-        std::cout << "camX:" << camX << ", camZ:" << camZ << std::endl;
+        printf("camlocation: (%.1f, 0.00, %.1f)\n", camX, camZ);
         // 位置：旋转摄像机；  目标：保持注视原点；  up向量：y方向；
-        view = view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("view", view);
+        printMatrix(view);
 
         // render boxes
         glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 10; i++)
+        /* cp 画1个、10个
+         */
+//        for (unsigned int i = 0; i < 10; i++)
+        for (unsigned int i = 0; i < 1; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f);

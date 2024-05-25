@@ -30,7 +30,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-// lighting 原始x>1，所以看不到，要缩小才看到
+/* cp 光源位置  原始x>1，所以看不到，要缩小才看到
+ */
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main()
@@ -129,12 +130,11 @@ int main()
     // 配置盒子的顶点信息 VAO
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO;
-    glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    glGenVertexArrays(1, &cubeVAO);
     glBindVertexArray(cubeVAO);
 
     // position attribute

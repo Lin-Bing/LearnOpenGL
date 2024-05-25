@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-/*
+/* cp
  帧缓冲
  
  附件是一个内存位置，它能够作为帧缓冲的一个缓冲，可以将它想象为一个图像。当创建一个附件的时候我们有两个选项：纹理或渲染缓冲对象(Renderbuffer Object)
@@ -213,13 +213,15 @@ int main()
 
     // framebuffer configuration
     // -------------------------
-    // 创建帧缓冲对象 fbo
+    /* cp 创建帧缓冲对象 fbo
+     */
     unsigned int framebuffer;
     glGenFramebuffers(1, &framebuffer);
     // 绑定帧缓冲，绑定到GL_FRAMEBUFFER之后所有的读取和写入帧缓冲的操作将会影响当前绑定的帧缓冲
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     
-    // 1.创建纹理附件，作为颜色附件
+    /* cp 1.创建纹理附件，作为颜色附件，即颜色缓冲
+     */
     // create a color attachment texture
     // 创建、绑定
     unsigned int textureColorbuffer;
@@ -239,7 +241,8 @@ int main()
      */
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
     
-    // 2.创建渲染缓冲对象rbo，作为深度、模板附件
+    /* cp 2.创建渲染缓冲对象rbo，作为深度、模板附件，即深度、模板缓冲
+     */
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     // 创建、绑定
     unsigned int rbo;
@@ -322,7 +325,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
-        // 2.绑定回默认缓冲，让渲染操作作用到屏幕缓冲，并绘制自定义帧缓冲的颜色纹理的四边形
+        /* cp 2.绑定回默认缓冲，让渲染操作作用到屏幕缓冲，并绘制带有自定义帧缓冲颜色纹理的四边形
+         */
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // 禁用深度测试，绘制四边形不需要关心深度测试，绘制普通场景时会重新开启
@@ -331,10 +335,12 @@ int main()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
         glClear(GL_COLOR_BUFFER_BIT);
         
-        // 3.绘制一个横跨整个屏幕的四边形，将帧缓冲的颜色缓冲（纹理）作为它的纹理
+        /* cp 3.绘制一个横跨整个屏幕的四边形，将帧缓冲的颜色缓冲（纹理）作为它的纹理
+         */
         // 由于离屏帧缓冲的读取产物顶点属性已经是标准坐标，不需要任何矩阵变换，隐藏不用绑定变换矩阵到着色器
         screenShader.use();
         glBindVertexArray(quadVAO);
+        // 这一次，绑定的纹理是纹理附件的id textureColorbuffer
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
         glDrawArrays(GL_TRIANGLES, 0, 6);
 

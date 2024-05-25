@@ -97,6 +97,10 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    
+    /* cp
+     使用VAO保存顶点缓冲对象、索引缓冲对象
+     */
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -109,6 +113,18 @@ int main()
         0, 1, 3,  // first Triangle
         1, 2, 3   // second Triangle
     };
+    
+    /* cp 注意：
+     1.绑定顺序：VAO、VBO、EBO
+     
+     2.解绑顺序：VBO/VAO、EBO
+     VBO：在执行glVertexAttribPointer绑定完顶点属性后就可以解绑
+     
+     VAO：存储完绑定关系后就可以解绑，要绘制使用时再绑定
+     
+     EBO：VAO会存储一个EBO绑定关系。即：glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer)
+     因此不可以在解绑VAO之前解绑EBO，否则就丢失了。而是在解绑VAO之后
+     */
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -123,21 +139,29 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // 允许
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glEnableVertexAttribArray(0);
 
+    // 允许
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    // 不允许
     // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
-
-
+    glBindVertexArray(0);
+    
+    // 允许
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+    
+    // 线框模式
     // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
     // -----------

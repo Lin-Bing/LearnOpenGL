@@ -51,6 +51,8 @@ int main()
     // ------------------------------------
     Shader ourShader("4.4.texture.vs", "4.4.texture.fs");
 
+    /* cp 纹理坐标范围很小。导致四方形映射到很小的纹理区域(0.45, 0.55)，造成纹理放大
+     */
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -98,6 +100,8 @@ int main()
     // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // note that we set the container wrapping method to GL_CLAMP_TO_EDGE
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    /* cp 由于GL_TEXTURE_MAG_FILTER放大策略使用GL_NEAREST邻近过滤，会直接取像素中心最近点的纹素，容易产生像素格子
+     */
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -109,6 +113,8 @@ int main()
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        /* cp 因为是纹理放大，用不用mipmap都无所谓，可以注释
+         */
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else

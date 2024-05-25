@@ -33,9 +33,9 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 
-/*
- SSMA 超采样抗锯齿
- 原理：使用比正常分辨率更高的分辨率（即超采样）来渲染场景，当图像输出在帧缓冲中更新时，分辨率会被下采样(Downsample)至正常的分辨率。这些额外的分辨率会被用来防止锯齿边缘的产生。
+/* cp 抗锯齿
+SSMA 超级采样抗锯齿
+ 原理：使用比正常分辨率更高的分辨率（即超级采样）来渲染场景，当图像输出在帧缓冲中更新时，分辨率会被下采样(Downsample)至正常的分辨率。这些额外的分辨率会被用来防止锯齿边缘的产生。
  问题：比平时要绘制更多的片段，它也会带来很大的性能开销
 
  MASS 多重采样抗锯齿
@@ -54,7 +54,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    /*
+    /* cp
      1.配置窗口系统使用包含4个样本的多重采样缓冲
      
      调用glfwCreateWindow创建渲染窗口时，每个屏幕坐标就会使用一个包含4个子采样点的颜色缓冲了。
@@ -94,7 +94,7 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
-    /*
+    /* cp
      2.启用多重采样
      */
     glEnable(GL_MULTISAMPLE); // enabled by default on some drivers, but not all so always enable to make sure

@@ -71,6 +71,9 @@ int main()
         return -1;
     }
 
+    /* cp 开启深度测试
+     计算方式：在片段深度值小于缓冲的深度值时通过测试
+     */
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
@@ -188,6 +191,8 @@ int main()
         // render
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        /* cp 清除深度缓冲
+         */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();

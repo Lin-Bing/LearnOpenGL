@@ -178,11 +178,16 @@ int main()
         lightingShader.setVec3("light.position", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
 
+        /* cp 测试物体材质
+         
+         把光照强度都设置为vec3(1.0)，测试物体材质
+         参考：https://learnopengl-cn.github.io/02%20Lighting/03%20Materials/
+            底部，材质表格
+         */
         // light properties
         lightingShader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f); // note that all light colors are set at full intensity
         lightingShader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
         // material properties
         lightingShader.setVec3("material.ambient", 0.0f, 0.1f, 0.06f);
         lightingShader.setVec3("material.diffuse", 0.0f, 0.50980392f, 0.50980392f);

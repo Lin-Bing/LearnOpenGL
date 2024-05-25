@@ -63,7 +63,8 @@ int main()
         return -1;
     }
 
-
+    /* cp 使用2个着色器程序，分别绘制不同的三角形
+     */
     // build and compile our shader program
     // ------------------------------------
     // we skipped compile log checks this time for readability (if you do encounter issues, add the compile-checks! see previous code samples)
@@ -136,7 +137,9 @@ int main()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        
+        /* cp 使用不同的着色器程序，分别绘制
+         */
         // now when we draw the triangle we first use the vertex and orange fragment shader from the first program
         glUseProgram(shaderProgramOrange);
         // draw the first triangle using the data from our first VAO

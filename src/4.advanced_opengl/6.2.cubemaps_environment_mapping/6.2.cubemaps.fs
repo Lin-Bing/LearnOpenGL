@@ -10,9 +10,12 @@ uniform samplerCube skybox;
 
 void main()
 {
-    // 观察方向向量（顶点位置 - 相机位置）
+    /* cp 反射天空盒子
+     
+     I 观察方向向量（顶点位置 - 相机位置）
+     R 以法向量为参考，计算反射向量
+     */
     vec3 I = normalize(Position - cameraPos);
-    // 以法向量为参考，计算反射向量
     vec3 R = reflect(I, normalize(Normal));
     // 使用反射向量做纹理采样
     FragColor = vec4(texture(skybox, R).rgb, 1.0);

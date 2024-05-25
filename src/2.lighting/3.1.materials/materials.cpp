@@ -179,6 +179,10 @@ int main()
         lightingShader.setVec3("viewPos", camera.Position);
 
         // light properties
+        /* cp 设置：光的属性
+         光的颜色由时间函数控制，系数分别是0.5 0.2 1.0
+         specular通常很亮，接近白色
+         */
         glm::vec3 lightColor;
         lightColor.x = sin(glfwGetTime() * 2.0f);
         lightColor.y = sin(glfwGetTime() * 0.7f);
@@ -189,6 +193,8 @@ int main()
         lightingShader.setVec3("light.diffuse", diffuseColor);
         lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
+        /* cp 设置：物体材质，即物体颜色，反光指数
+         */
         // material properties
         lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
         lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);

@@ -173,7 +173,10 @@ int main()
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
+        /* cp 物体
+         物体颜色、灯光颜色、光源位置
+         */
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
@@ -194,7 +197,8 @@ int main()
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
+        /* cp 灯光
+         */
         // also draw the lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);

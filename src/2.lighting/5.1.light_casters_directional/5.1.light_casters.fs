@@ -9,7 +9,7 @@ struct Material {
 
 struct Light {
     //vec3 position;
-    vec3 direction;
+    vec3 direction; // 平行光（比如太阳光），所有光线方向一致
 
     vec3 ambient;
     vec3 diffuse;
@@ -32,7 +32,7 @@ void main()
     // diffuse 
     vec3 norm = normalize(Normal);
     // vec3 lightDir = normalize(light.position - FragPos);
-    vec3 lightDir = normalize(-light.direction);  
+    vec3 lightDir = normalize(-light.direction);   // 直接使用方向，就不用位置相减去计算
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.diffuse * diff * texture(material.diffuse, TexCoords).rgb;  
     

@@ -86,7 +86,9 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 绘制4个点 GL_POINTS，gs会转化为绘制4个三角形
+        /* cp 绘制4个点 GL_POINTS，几何着色器会转化为绘制三角形，实现图元的改变
+         
+         */
         // draw points
         shader.use();
         glBindVertexArray(VAO);

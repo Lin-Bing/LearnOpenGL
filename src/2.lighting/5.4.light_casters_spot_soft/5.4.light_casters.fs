@@ -47,7 +47,7 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;  
     
-    // spotlight (soft edges)
+    // spotlight (soft edges) 软化边缘
     float theta = dot(lightDir, normalize(-light.direction)); 
     float epsilon = (light.cutOff - light.outerCutOff);
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);

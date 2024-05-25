@@ -16,6 +16,8 @@ public:
     // ------------------------------------------------------------------------
     Shader(const char* vertexPath, const char* fragmentPath)
     {
+        /* cp 获取着色器内容
+         */
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
         std::string fragmentCode;
@@ -46,6 +48,9 @@ public:
         }
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
+        
+        /* cp 编译链接着色器
+         */
         // 2. compile shaders
         unsigned int vertex, fragment;
         // vertex shader

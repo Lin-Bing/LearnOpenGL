@@ -52,7 +52,8 @@ int main()
     Shader ourShader("4.1.texture.vs", "4.1.texture.fs"); 
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
-    // -0.5~0.5，占据标准空间坐标(-1.0,1.0)的一半
+    /* cp 顶点数据，加上纹理坐标
+     */
     // ------------------------------------------------------------------
     float vertices[] = {
         // positions          // colors           // texture coords
@@ -88,7 +89,9 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-
+    /* cp 加载纹理
+     设置纹理环绕、纹理过滤规则
+     */
     // load and create a texture 
     // -------------------------
     unsigned int texture;
@@ -103,6 +106,7 @@ int main()
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    // 设置纹理数据，mipmap
     unsigned char *data = stbi_load(FileSystem::getPath("resources/textures/container.jpg").c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
@@ -113,6 +117,7 @@ int main()
     {
         std::cout << "Failed to load texture" << std::endl;
     }
+    // 释放图片
     stbi_image_free(data);
 
 
@@ -128,7 +133,9 @@ int main()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        
+        /* cp 绑定纹理
+         */
         // bind Texture
         glBindTexture(GL_TEXTURE_2D, texture);
 

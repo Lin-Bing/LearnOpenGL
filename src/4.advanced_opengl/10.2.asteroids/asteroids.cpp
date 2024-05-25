@@ -157,7 +157,8 @@ int main()
         shader.setMat4("model", model);
         planet.Draw(shader);
 
-        // 绘制1000个岩石
+        /* cp 普通渲染，1000次draw call，绘制1000个岩石
+         */
         // draw meteorites
         for (unsigned int i = 0; i < amount; i++)
         {

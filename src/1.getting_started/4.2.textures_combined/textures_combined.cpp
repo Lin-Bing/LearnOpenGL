@@ -103,8 +103,9 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
+    
     /* cp
-     OpenGL要求y轴0.0坐标是在图片的底部的，但是图片的y轴0.0坐标通常在顶部，
+     OpenGL要求图片纹理坐标(0,0)在图片左下角，但图片信息中的原点(0,0)一般是在左上角，所以需要翻转
      下面调用，使得stb_image.h能够在图像加载时帮助我们翻转y轴
      也可以在着色器中翻转y值 1.0-y
      */
@@ -145,7 +146,12 @@ int main()
     }
     stbi_image_free(data);
 
-    // 配置采样器对应的纹理单元
+    /* cp 配置采样器对应的纹理单元
+     纹理的位置称为纹理单元(Texture Unit)。一个纹理的默认纹理单元是0，它是默认的激活纹理单元
+     当有多个纹理单元时，要使用glUniform1i告诉OpenGL每个着色器采样器属于哪个纹理单元
+     
+     即采样器texture1对应纹理单元0，采样器texture2对应纹理单元1
+     */
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
     ourShader.use(); // don't forget to activate/use the shader before setting uniforms!
@@ -169,6 +175,8 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        /* cp 激活后绑定纹理单元。GL_TEXTURE0默认激活。对应上面的配置采样器
+         */
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);

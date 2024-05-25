@@ -165,14 +165,23 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-
+        
+        /* cp 矩阵转换转换：变换顺序从后往前：先旋转，后平移
+         */
         // create transformations
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         // 平移到右下角 (0.5f, -0.5f)
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
         // 沿着z轴逆时针旋转
         transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-
+        
+        /* cp 练习题1
+         先平移到右下角，再沿着原点旋转，就变成大风车了
+         */
+//        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+//        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        
+        
         // get matrix's uniform location and set matrix
         ourShader.use();
         unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");

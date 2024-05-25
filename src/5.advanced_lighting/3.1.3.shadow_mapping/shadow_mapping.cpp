@@ -130,6 +130,9 @@ int main()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    /* cp
+     让所有超出深度贴图的坐标的深度范围是1.0，这样超出的坐标将永远不在阴影之中。我们可以储存一个边框颜色，然后把深度贴图的纹理环绕选项设置为GL_CLAMP_TO_BORDER
+     */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -198,14 +201,12 @@ int main()
             glBindTexture(GL_TEXTURE_2D, woodTexture);
             renderScene(simpleDepthShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // reset viewport
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
 
         // 2. render scene as normal using the generated depth/shadow map  
         // --------------------------------------------------------------
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+//        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glViewport(0, 0, SCR_WIDTH*2, SCR_HEIGHT*2);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);

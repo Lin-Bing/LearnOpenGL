@@ -10,6 +10,9 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+/* cp 2个顶点属性，分别是位置、颜色。
+ 三角形内像素的颜色，根据顶点颜色做插值，使用三角形重心坐标
+ */
 const char *vertexShaderSource ="#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec3 aColor;\n"
@@ -101,6 +104,8 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    /* cp 顶点数据包含：位置、颜色
+     */
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -120,6 +125,13 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    /* cp 使用VBO配置2个顶点属性：
+     顶点位置、
+     3个float类型，
+     非标转化
+     步长6 * sizeof(float)
+     偏移量
+     */
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);

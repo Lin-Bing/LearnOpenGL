@@ -12,6 +12,11 @@
 
 #include <iostream>
 
+
+/* cp 练习4
+ 放射光贴图，表示发光物(眼睛、灯带)等，其实就是不受光照模型的影响，直接叠加贴图的颜色
+ */
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);

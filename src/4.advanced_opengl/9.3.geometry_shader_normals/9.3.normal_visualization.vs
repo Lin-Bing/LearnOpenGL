@@ -11,7 +11,7 @@ uniform mat4 model;
 
 void main()
 {
-    // ???
+    /* cp ??? */
     
     // 法线矩阵，变换为裁剪空间法向量
     mat3 normalMatrix = mat3(transpose(inverse(view * model)));

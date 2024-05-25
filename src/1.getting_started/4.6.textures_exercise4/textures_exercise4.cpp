@@ -205,6 +205,8 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    /* cp 动态改变mixValue参数
+     */
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
         mixValue += 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)

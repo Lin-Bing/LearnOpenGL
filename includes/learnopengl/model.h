@@ -55,7 +55,8 @@ private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path)
     {
-        // 根据路径，加载模型
+        /* cp 根据路径，加模型的Scene场景，Scene用于把Model加工成Mesh，之后就用不到了
+         */
         // read file via ASSIMP
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -108,6 +109,7 @@ private:
         // walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
+            // 把assimp的顶点转化为glm的顶点，两者类型不一致不能直接赋值，需要转化
             Vertex vertex;
             glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             // positions
@@ -209,7 +211,7 @@ private:
                 }
             }
             
-            // 加载新纹理
+            // 加载新纹理，存储path做复用标识，避免重复加载
             if(!skip)
             {   // if texture hasn't been loaded already, load it
                 Texture texture;

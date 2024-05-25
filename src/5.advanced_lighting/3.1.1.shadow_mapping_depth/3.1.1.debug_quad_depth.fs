@@ -15,8 +15,13 @@ float LinearizeDepth(float depth)
 }
 
 void main()
-{             
+{
+    /*
+     纹理映射，获取深度，由于只有深度值，因此rgb只有r
+     把从光源位置为视角的深度值，生成rgb灰度颜色，作为片段颜色。
+     */
     float depthValue = texture(depthMap, TexCoords).r;
     // FragColor = vec4(vec3(LinearizeDepth(depthValue) / far_plane), 1.0); // perspective
+    //
     FragColor = vec4(vec3(depthValue), 1.0); // orthographic
 }

@@ -195,6 +195,8 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /* cp 平行光，固定光源方向
+         */
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);

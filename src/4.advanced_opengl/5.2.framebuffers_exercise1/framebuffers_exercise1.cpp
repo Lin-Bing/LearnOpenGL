@@ -136,6 +136,8 @@ int main()
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+    /* cp 后视镜四边形，比较小
+     */
     float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates. NOTE that this plane is now much smaller and at the top of the screen
         // positions   // texCoords
         -0.3f,  1.0f,  0.0f, 1.0f,
@@ -193,6 +195,8 @@ int main()
     screenShader.use();
     screenShader.setInt("screenTexture", 0);
 
+    /* cp <#说明#>
+     */
     // framebuffer configuration
     // -------------------------
     unsigned int framebuffer;
@@ -235,6 +239,8 @@ int main()
         processInput(window);
 
 
+        /* cp 1.绘制后视镜到离屏帧缓冲framebuffer中
+         */
         // first render pass: mirror texture.
         // bind to framebuffer and draw to color texture as we normally 
         // would, but with the view camera reversed.
@@ -249,6 +255,7 @@ int main()
 
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
+        // 由于是后视镜，俯仰角偏移180度，再绘制
         camera.Yaw   += 180.0f; // rotate the camera's yaw 180 degrees around
         camera.ProcessMouseMovement(0, 0, false); // call this to make sure it updates its camera vectors, note that we disable pitch constrains for this specific case (otherwise we can't reverse camera's pitch values)
         glm::mat4 view = camera.GetViewMatrix();
@@ -257,6 +264,7 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
+        // 绘制箱子、地板
         // cubes
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
@@ -275,6 +283,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
+        /* cp 2.正常绘制箱子、模板到默认帧缓冲中
+         */
         // second render pass: draw as normal
         // ----------------------------------
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -304,6 +314,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
+        /* cp 3. 绘制后视镜到默认帧缓冲中
+         */
         // now draw the mirror quad with screen texture
         // --------------------------------------------
         glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.

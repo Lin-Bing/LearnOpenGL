@@ -81,12 +81,19 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    /* cp 创建着色器
+     shadow_mapping_depth 用于生成深度阴影贴图
+     debug_quad 用于绘制阴影
+     shadow_mapping 用于使用深度贴图，判断场景中的片段是否在阴影中，进行光照模型计算
+     */
     // build and compile shaders
     // -------------------------
     Shader shader("3.1.2.shadow_mapping.vs", "3.1.2.shadow_mapping.fs");
     Shader simpleDepthShader("3.1.2.shadow_mapping_depth.vs", "3.1.2.shadow_mapping_depth.fs");
     Shader debugDepthQuad("3.1.2.debug_quad.vs", "3.1.2.debug_quad_depth.fs");
 
+    /* cp 配置地板 VAO
+     */
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float planeVertices[] = {
@@ -114,10 +121,13 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glBindVertexArray(0);
 
+    // 地板纹理
     // load textures
     // -------------
     unsigned int woodTexture = loadTexture(FileSystem::getPath("resources/textures/wood.png").c_str());
 
+    /* cp 配置帧缓冲，用于生成阴影深度贴图
+     */
     // configure depth map FBO
     // -----------------------
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
@@ -127,6 +137,7 @@ int main()
     unsigned int depthMap;
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
+    // 数据格式是深度GL_DEPTH_COMPONENT
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -134,6 +145,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    // 缓冲类型是深度附件GL_DEPTH_ATTACHMENT
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
@@ -171,6 +183,8 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /* cp 1.从光源空间，绘制场景到到帧缓冲depthMapFBO，生成深度贴图
+         */
         // 1. render depth of scene to texture (from light's perspective)
         // --------------------------------------------------------------
         glm::mat4 lightProjection, lightView;
@@ -188,22 +202,25 @@ int main()
             glClear(GL_DEPTH_BUFFER_BIT);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, woodTexture);
+            // 绘制地板、箱子，到深度贴图
             renderScene(simpleDepthShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // reset viewport
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        /* cp 2.相机空间，绘制场景到默认缓冲
+         */
         // 2. render scene as normal using the generated depth/shadow map  
         // --------------------------------------------------------------
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        // mac是视网膜屏，需要*2
+//        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glViewport(0, 0, SCR_WIDTH*2, SCR_HEIGHT*2);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // 绘制场景
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
+        // 设置光源位置、相机位置、光源空间变换矩阵，用于执行相关矩阵运算，判断片段是否在阴影中，进行光照计算，绘制阴影
         // set light uniforms
         shader.setVec3("viewPos", camera.Position);
         shader.setVec3("lightPos", lightPos);
@@ -214,6 +231,7 @@ int main()
         glBindTexture(GL_TEXTURE_2D, depthMap);
         renderScene(shader);
 
+        // 阴影可视化，用于调试，（这里去掉了）
         // render Depth map to quad for visual debugging
         // ---------------------------------------------
         debugDepthQuad.use();

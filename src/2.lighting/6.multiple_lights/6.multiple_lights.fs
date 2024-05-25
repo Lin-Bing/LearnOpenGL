@@ -1,12 +1,16 @@
 #version 330 core
 out vec4 FragColor;
 
+/* cp 物体材质
+ */
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
     float shininess;
 }; 
 
+/* cp 定向光源
+ */
 struct DirLight {
     vec3 direction;
 	
@@ -15,6 +19,8 @@ struct DirLight {
     vec3 specular;
 };
 
+/* cp 点光源
+ */
 struct PointLight {
     vec3 position;
     
@@ -27,6 +33,8 @@ struct PointLight {
     vec3 specular;
 };
 
+/* cp 聚光灯
+ */
 struct SpotLight {
     vec3 position;
     vec3 direction;
@@ -65,6 +73,8 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
     
+    /* cp 多光源合并结果
+     */
     // == =====================================================
     // Our lighting is set up in 3 phases: directional, point lights and an optional flashlight
     // For each phase, a calculate function is defined that calculates the corresponding color

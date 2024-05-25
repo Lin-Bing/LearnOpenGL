@@ -168,6 +168,9 @@ int main()
 
 
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        
+        /* cp 画第一个箱子
+         */
         // first container
         // ---------------
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
@@ -181,12 +184,14 @@ int main()
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         
+        /* cp 画第二个箱子
+         */
         // second transformation
         // ---------------------
         transform = glm::mat4(1.0f); // reset it to identity matrix
         // 平移到左上角 (-0.5f, 0.5f)
         transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
-        // 缩放
+        // 缩放： sin三角函数范围-1到1
         float scaleAmount = fabs(sin(glfwGetTime()));
         transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform[0][0]); // this time take the matrix value array's first element as its memory pointer value

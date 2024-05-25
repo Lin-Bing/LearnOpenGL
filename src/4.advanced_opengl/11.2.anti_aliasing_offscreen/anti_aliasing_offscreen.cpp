@@ -34,9 +34,9 @@ float lastFrame = 0.0f;
 
 
 
-/* 
+/* cp
 离屏MASS
-在使用自定义帧缓冲进行离屏渲染时，若要使用MASS，需自己动手生成多重采样缓冲
+在使用自定义帧缓冲进行离屏渲染时，若要使用MASS，需自己动手生成帧缓冲对象，并附加上：多重采样纹理附件、多重采样渲染缓冲对象
  */
 
 int main()
@@ -174,7 +174,8 @@ int main()
     unsigned int framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    // 1.创建MASS纹理附件，作为颜色附件
+    /* cp 1.创建MASS纹理附件，作为颜色附件
+     */
     // create a multisampled color attachment texture
     unsigned int textureColorBufferMultiSampled;
     glGenTextures(1, &textureColorBufferMultiSampled);
@@ -190,7 +191,9 @@ int main()
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     // 把纹理对象附加到帧缓冲上
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
-    // 2.创建MASS渲染缓冲对象rbo，作为深度、模板附件
+    
+    /* cp 2.创建MASS渲染缓冲对象rbo，作为深度、模板附件
+     */
     // create a (also multisampled) renderbuffer object for depth and stencil attachments
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
@@ -206,8 +209,7 @@ int main()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // configure second post-processing framebuffer
-    /*
-     创建普通离屏帧缓冲对象 fbo，过渡作用。
+    /* cp 创建普通离屏帧缓冲对象 fbo，过渡作用。
      原因：多重采样缓冲比较特别，不能直接把它的缓冲图像用于其他运行，比如在片段着色器中使用多重采样的纹理进行纹理采样。
      解决：将 中介帧缓冲对象，多重采样缓冲位块传送到一个没有使用多重采样纹理附件的FBO中。然后用这个普通的颜色附件来做后期处理。
      因此此处创建一个普通FBO，作为中介帧缓冲对象，用于还原多重采样的图像。只需要颜色缓冲，不需要渲染缓冲对象
@@ -257,7 +259,8 @@ int main()
 
         
         // 1. draw scene as normal in multisampled buffers
-        // 1.绘制立方体到MASS FBO中。
+        /* cp 1.绘制立方体到MASS FBO中。
+         */
         // 需要先把FBO绑定为激活的帧缓冲
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -275,8 +278,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
-        /*
-         2.把多重采样FBO图像位块复制到普通的中介FBO，用于把多重采样缓冲还原为普通缓冲
+        /* cp 2.把多重采样FBO图像位块复制到普通的中介FBO，用于把多重采样缓冲还原为普通缓冲
             - MASS FBO 绑定为读取帧缓冲目标
             - 普通中介FBO 绑定为绘制缓冲目标
             - 复制图像位块，还原缓冲。将一个用4个屏幕空间坐标所定义的源区域复制到一个同样用4个屏幕空间坐标所定义的目标区域中
@@ -286,7 +288,8 @@ int main()
         glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         // 3. now render quad with scene's visuals as its texture image
-        // 3.把中介FBO上的四方形纹理绘制到默认缓冲中
+        /* cp 3.把中介FBO上的四方形纹理绘制到默认缓冲中
+         */
         // 绑定默认缓冲
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

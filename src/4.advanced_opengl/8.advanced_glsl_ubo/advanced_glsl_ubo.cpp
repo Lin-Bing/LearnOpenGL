@@ -143,7 +143,8 @@ int main()
     // configure a uniform buffer object
     // 配置立方体uniform缓冲对象 ubo
     // ---------------------------------
-    // 1.把顶点着色器的Uniform块链接到绑定点0。多个着色器的Uniform块都绑定到绑定点0，复用同一个ubo
+    /* cp 1.把顶点着色器的Uniform块链接到绑定点0。多个着色器的Uniform块都绑定到绑定点0，复用同一个ubo
+     */
     // first. We get the relevant block indices
     unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(shaderRed.ID, "Matrices");
     unsigned int uniformBlockIndexGreen = glGetUniformBlockIndex(shaderGreen.ID, "Matrices");
@@ -154,7 +155,10 @@ int main()
     glUniformBlockBinding(shaderGreen.ID, uniformBlockIndexGreen, 0);
     glUniformBlockBinding(shaderBlue.ID, uniformBlockIndexBlue, 0);
     glUniformBlockBinding(shaderYellow.ID, uniformBlockIndexYellow, 0);
-    // 2.创建uniform缓冲对象 ubo， 也链接到相同的绑定点0
+    
+    /* cp 2.创建uniform缓冲对象 ubo， 也链接到相同的绑定点0
+     
+     */
     // Now actually create the buffer
     unsigned int uboMatrices;
     glGenBuffers(1, &uboMatrices);
@@ -167,7 +171,9 @@ int main()
     // define the range of the buffer that links to a uniform binding point
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
 
-    // 3.填充ubo，渲染
+    /* cp 3.填充ubo，渲染
+     
+     */
     //把投影矩阵存放到ubo前半部分
     // store the projection matrix (we only do this once now) (note: we're not using zoom anymore by changing the FoV)
     glm::mat4 projection = glm::perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);

@@ -168,17 +168,19 @@ int main()
   
         // activate shader
         ourShader.use();
-      
+        
+        /* cp MVP变换
+         */
         // create transformations
         glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 view          = glm::mat4(1.0f);
         glm::mat4 projection    = glm::mat4(1.0f);
         
-        // 模型矩阵：沿x轴顺时针旋转55度
+        // 模型矩阵：沿x轴反向针旋转55度
         model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         // 视觉矩阵：相机在标准位置(即原点，lookat -Z)，场景向后移动3.0
         view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        // 投影矩阵：透视投影
+        // 投影矩阵：透视投影。fov，宽高比、远近面
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         // retrieve the matrix uniform locations
         unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");

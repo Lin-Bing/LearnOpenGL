@@ -282,13 +282,15 @@ void processInput(GLFWwindow *window)
 
     float cameraSpeed = 2.5 * deltaTime;
     
+    /* cp AWSD，改变相机位置。WS改变前后即z轴大小，AD改变左右即及x轴大小
+     */
     // 键盘按W，相机前移，即往相机方向注视的焦点cameraFront移动。实际上是等于cameraPos z值减小（注意之类cameraFront的z分量是负值，加法即是减小）
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     // 键盘按S，相机后移
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         cameraPos -= cameraSpeed * cameraFront;
-    // 键盘按A，左移，因此减去n个x方向单位向量
+    // 键盘按A，左移，因此减去n个x方向单位向量， front（z轴）与up（y轴）叉乘就是x轴方向
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     // 键盘按D，右移，因此加上n个x方向单位向量

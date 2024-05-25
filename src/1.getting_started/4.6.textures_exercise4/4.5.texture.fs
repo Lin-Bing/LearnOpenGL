@@ -4,6 +4,8 @@ out vec4 FragColor;
 in vec3 ourColor;
 in vec2 TexCoord;
 
+/* cp mix参数
+ */
 uniform float mixValue;
 
 // texture samplers

@@ -74,6 +74,7 @@ public:
         unsigned int heightNr   = 1;
         for(unsigned int i = 0; i < textures.size(); i++)
         {
+            // 激活纹理
             glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN) 纹理属性名称规则
             string number;
@@ -87,8 +88,10 @@ public:
              else if(name == "texture_height")
                 number = std::to_string(heightNr++); // transfer unsigned int to string
 
+            // 设置采样器对应的纹理单元
             // now set the sampler to the correct texture unit
             glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+            // 绑定纹理
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }

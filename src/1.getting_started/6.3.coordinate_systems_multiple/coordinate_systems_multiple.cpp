@@ -19,17 +19,38 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 
+//void printMatrix(glm::mat4 &mat) {
+//    double dArray[16] = {0.0};
+//    const float *pSource = (const float*)glm::value_ptr(mat);
+//    for (int i = 0; i < 16; ++i) {
+//        if (i%4 == 0) {
+//            printf("\n");
+//        }
+//        dArray[i] = pSource[i];
+////        std::cout << dArray[i] << " ";
+//        printf("%3f ", dArray[i]);
+//    }
+//    printf("\n");
+//}
+
+/* cp GLM的默认布局是列主序，跟OpenGL所需要的一样。因此打印时需要转置
+ */
 void printMatrix(glm::mat4 &mat) {
-    double dArray[16] = {0.0};
+    double dArray[4][4] = {0.0};
     const float *pSource = (const float*)glm::value_ptr(mat);
     for (int i = 0; i < 16; ++i) {
-        if (i%4 == 0) {
-            printf("\n");
-        }
-        dArray[i] = pSource[i];
-//        std::cout << dArray[i] << " ";
-        printf("%3f", dArray[i]);
+        int col = i/4;
+        int row = i%4;
+        dArray[row][col] = pSource[i];
     }
+    
+    for (int i=0; i<4; i++) {
+        printf("\n");
+        for (int j=0; j<4; j++) {
+            printf("%.1f ", dArray[i][j]);
+        }
+    }
+    
     printf("\n");
 }
 
@@ -213,9 +234,9 @@ int main()
     glm::mat4 view          = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
     glm::mat4 projection    = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-    
-    // 场景后移10.0， 沿y轴顺时针旋转90度
-//    view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+    // view往前3（z轴负方向），等于相机往后移动3
+    view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    // 沿y轴顺时针旋转90度
 //    view = glm::rotate(view, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     printMatrix(view);
@@ -243,17 +264,20 @@ int main()
         ourShader.use();
 
         // create transformations
-//        glm::mat4 view          = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-//        glm::mat4 projection    = glm::mat4(1.0f);
-//        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-//        view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        /*
+        glm::mat4 view          = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        glm::mat4 projection    = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        */
         // pass transformation matrices to the shader
         ourShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
         ourShader.setMat4("view", view);
 
         // render boxes
         glBindVertexArray(VAO);
-        // 把同一个盒子渲染10次，使用模型矩阵，摆放到不同的位置、角度
+        /* cp 把同一个盒子渲染10次，使用模型矩阵，摆放到不同的位置、角度
+         */
         for (unsigned int i = 0; i < 10; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing

@@ -45,9 +45,15 @@ int main()
         return -1;
     }
 
+    /* cp 使用着色器类，着色器文件通过cmake软链到程序目录，因此程序能找到
+     */
     // build and compile our shader program
     // ------------------------------------
     Shader ourShader("3.3.shader.vs", "3.3.shader.fs"); // you can name your shader files however you like
+    
+    /* cp 练习题三
+     */
+//    Shader ourShader("3.3.shader.exercise3.vs", "3.3.shader.exercise3.fs"); // you can name your shader files however you like
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -92,6 +98,8 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        /* cp 使用着色器程序
+         */
         // render the triangle
         ourShader.use();
         glBindVertexArray(VAO);

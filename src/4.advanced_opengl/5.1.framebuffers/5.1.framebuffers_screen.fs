@@ -16,7 +16,7 @@ void main()
     //*/
     
     // 反相效果：对颜色取反
-    // FragColor = vec4(vec3(1.0 - texture(screenTexture, TexCoords)), 1.0);
+    //FragColor = vec4(vec3(1.0 - texture(screenTexture, TexCoords)), 1.0);
     
     // 灰度：移除场景中除了黑白灰以外所有的颜色，取所有的颜色分量，将它们平均化
     /*
@@ -25,9 +25,8 @@ void main()
     FragColor = vec4(average, average, average, 1.0);
     */
     
-    
-    // 锐化运行奔溃？？？
-    /*
+    // 锐化：增强图像的边缘及灰度跳变的部分，使图像变得清晰
+    //*
     vec2 offsets[9] = vec2[](
         vec2(-offset,  offset), // 左上
         vec2( 0.0f,    offset), // 正上
@@ -57,5 +56,5 @@ void main()
         col += sampleTex[i] * kernel[i];
     }
     FragColor = vec4(col, 1.0);
-     */
+    // */
 }

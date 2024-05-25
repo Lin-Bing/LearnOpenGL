@@ -147,7 +147,7 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // 2.配置光源顶点定西
+    // 2.配置光源顶点信息
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);

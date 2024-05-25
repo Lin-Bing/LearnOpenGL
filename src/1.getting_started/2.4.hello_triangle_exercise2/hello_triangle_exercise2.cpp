@@ -97,6 +97,8 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    /* cp 2个顶点数据，分别绑定到2个VAO
+     */
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float firstTriangle[] = {
@@ -147,6 +149,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
+        
+        /* cp 绘制2个三角形
+         */
         // draw first triangle using the data from the first VAO
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);

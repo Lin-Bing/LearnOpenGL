@@ -10,7 +10,8 @@ uniform mat4 projection;
 
 void main()
 {
-    // 对每个顶点做矩阵变换
+    /* cp 对每个顶点做矩阵变换：从右到左应用矩阵
+     */
 	gl_Position = projection * view * model * vec4(aPos, 1.0);
 	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 }

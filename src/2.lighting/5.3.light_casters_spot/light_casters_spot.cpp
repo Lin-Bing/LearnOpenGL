@@ -195,6 +195,9 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /* cp 聚光灯属性
+         cutOff直接传入余弦值，避免着色器计算反三角函数
+         */
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("light.position", camera.Position);
@@ -202,6 +205,8 @@ int main()
         lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
         lightingShader.setVec3("viewPos", camera.Position);
 
+        /* cp 其他光照属性
+         */
         // light properties
         lightingShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
         // we configure the diffuse intensity slightly higher; the right lighting conditions differ with each lighting method and environment.
@@ -212,6 +217,8 @@ int main()
         lightingShader.setFloat("light.linear", 0.09f);
         lightingShader.setFloat("light.quadratic", 0.032f);
 
+        /* cp 材质
+         */
         // material properties
         lightingShader.setFloat("material.shininess", 32.0f);
 

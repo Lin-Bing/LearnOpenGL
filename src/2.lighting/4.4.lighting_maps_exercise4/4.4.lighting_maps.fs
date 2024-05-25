@@ -41,7 +41,7 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;  
     
-      // emission
+      // emission 放射光贴图，表示发光物(眼睛、灯带)等，其实就是不受光照模型的影响，直接纹理映射后，叠加贴图的颜色
     vec3 emission = texture(material.emission, TexCoords).rgb;
         
     vec3 result = ambient + diffuse + specular + emission;

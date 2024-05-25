@@ -241,7 +241,9 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 绘制箱子
+        /* cp 绘制箱子
+         注意箱子绑定的是立方体贴图纹理，因为需要用反射来采样
+         */
         // draw scene as normal
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
@@ -255,11 +257,12 @@ int main()
         // cubes
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture); // 注意箱子绑定的是立方体贴图纹理
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
-        // 绘制天空盒
+        /* cp 绘制天空盒
+         */
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use();

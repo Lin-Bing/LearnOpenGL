@@ -76,9 +76,13 @@ int main()
     // 设置全局状态：深度测试、混合
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
-    // 开启混合
+    /* cp 开启混合,
+     设置 源和目标因子，源因子：源alpha，目标因子：1-源alpha
+     Cres = Csrc * Fsrc + Sdest * Fdest
+     Fsrc = alpha，Fdest = 1 - alpha
+     Cres = Csrc * alpha + Cdest * (1-alpha)
+     */
     glEnable(GL_BLEND);
-    // 设置 源和目标因子，源因子：源alpha，目标因子：1-源alpha
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // build and compile shaders
@@ -228,7 +232,7 @@ int main()
         processInput(window);
 
         // sort the transparent windows before rendering
-        // 对透明物体排序：即根据窗户与摄像机距离排序
+        // 对透明物体排序：即根据窗户与摄像机距离排序。 std::map有序
         // ---------------------------------------------
         std::map<float, glm::vec3> sorted;
         for (unsigned int i = 0; i < windows.size(); i++)
@@ -242,7 +246,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /*
+        /* cp
          绘制
          先绘制所有不透明的物体。
          对所有透明的物体排序。

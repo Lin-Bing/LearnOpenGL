@@ -53,7 +53,8 @@ int main()
     Shader shader("10.1.instancing.vs", "10.1.instancing.fs");
 
     // generate a list of 100 quad locations/translation-vectors
-    // 构建偏移向量数组，用于构建100个从(-0.9,-0.9)到(0.9,0.9)的偏移向量
+    /* cp 构建偏移向量数组，用于构建100个从(-0.9,-0.9)到(0.9,0.9)的偏移向量
+     */
     // ---------------------------------------------------------
     glm::vec2 translations[100];
     int index = 0;
@@ -105,11 +106,10 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
     // also set instance data
     // 配置顶点属性 aOffset偏移向量
-    /*
-     实例化数组：它被定义为一个顶点属性，仅在顶点着色器渲染一个新的实例时才会更新
+    /* cp 实例化数组：它被定义为一个顶点属性，仅在顶点着色器渲染一个新的实例时才会更新
      glVertexAttribDivisor
      参数1 顶点属性
-     参数2 属性除数，默认是0：OpenGL在顶点着色器的每次迭代时更新顶点属性；1：OpenGL在渲染一个新实例的时候更新顶点属性；2：每2个实例更新一次属性
+     参数2 属性除数，默认是0：OpenGL在顶点着色器的每次迭代时更新顶点属性(每个顶点)；1：OpenGL在渲染一个新实例的时候更新顶点属性；2：每2个实例更新一次属性
      */
     glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer

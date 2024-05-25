@@ -8,7 +8,6 @@ layout (triangle_strip, max_vertices = 3) out;
 in VS_OUT {
     vec2 texCoords; // 纹理坐标
 } gs_in[];
-
 // 向fs输出纹理坐标
 out vec2 TexCoords; 
 
@@ -29,7 +28,7 @@ vec3 GetNormal()
 // 顶点计算爆炸效果：顶点随着时间沿法向量方向移动
 vec4 explode(vec4 position, vec3 normal)
 {
-    // 位置沿法向量方向移动（0,2）：sin取值范围(-1,1),(sin(time) + 1.0) / 2.0 取值范围即(0,1)
+    // 位置沿法向量方向移动，sin取值范围(-1,1), (sin(time) + 1.0) / 2.0 取值范围即(0,1)
     float magnitude = 2.0;
     vec3 direction = normal * ((sin(time) + 1.0) / 2.0) * magnitude; 
     return position + vec4(direction, 0.0); // 原始位置值 + 法向量方向移动值，产生爆炸效果
@@ -40,8 +39,10 @@ void main() {
     // 法向量
     vec3 normal = GetNormal();
     
-    // 发射3个变换后的顶点
     
+    /* cp 发射3个变换后的顶点
+     把顶点位置
+     */
     // 爆炸效果变换
     gl_Position = explode(gl_in[0].gl_Position, normal);
     // 顶点发射前输出纹理坐标

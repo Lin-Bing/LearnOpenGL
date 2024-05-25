@@ -114,9 +114,13 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("model", model);
 
+        /* cp 1.绘制模型
+         */
         // draw model as usual
         backpack.Draw(shader);
 
+        /* cp 2.绘制法线
+         */
         // then draw model with normal visualizing geometry shader
         normalShader.use();
         normalShader.setMat4("projection", projection);

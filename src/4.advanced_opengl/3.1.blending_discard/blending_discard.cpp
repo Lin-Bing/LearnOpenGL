@@ -368,7 +368,7 @@ unsigned int loadTexture(char const * path)
         glGenerateMipmap(GL_TEXTURE_2D);
 
         /*
-         由于使用透明值，纹理图像的顶部将会与底部边缘的纯色值进行插值。结果是一个半透明的有色边框，你可能会看见它环绕着你的纹理四边形。
+         由于纹理有透明值，环绕方式使用GL_REPEAT的话，纹理图像的顶部将会与底部边缘的纯色值进行插值。结果是一个半透明的有色边框，你可能会看见它环绕着你的纹理四边形。
          要想避免这个，每当你alpha纹理的时候，请将纹理的环绕方式设置为GL_CLAMP_TO_EDGE
          */
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 

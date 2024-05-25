@@ -203,6 +203,8 @@ int main()
         lightingShader.setVec3("light.position", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
 
+        /* cp 光属性。定义了光衰减相关元素
+         */
         // light properties
         lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
