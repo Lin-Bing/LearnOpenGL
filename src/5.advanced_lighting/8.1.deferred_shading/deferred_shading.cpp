@@ -100,12 +100,15 @@ int main()
     objectPositions.push_back(glm::vec3( 3.0,  -0.5,  3.0));
 
 
+    /* cp 配置帧缓冲，附件
+     */
     // configure g-buffer framebuffer
     // ------------------------------
     unsigned int gBuffer;
     glGenFramebuffers(1, &gBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
     unsigned int gPosition, gNormal, gAlbedoSpec;
+    // 颜色附件0，使用纹理对象存储片段位置gPosition
     // position color buffer
     glGenTextures(1, &gPosition);
     glBindTexture(GL_TEXTURE_2D, gPosition);
@@ -113,6 +116,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+    // 颜色附件1，使用纹理对象存储片段法线gNormal
     // normal color buffer
     glGenTextures(1, &gNormal);
     glBindTexture(GL_TEXTURE_2D, gNormal);
@@ -120,6 +124,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+    // 颜色附件2，使用纹理对象存储漫反射（物体颜色）和反光度
     // color + specular color buffer
     glGenTextures(1, &gAlbedoSpec);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
@@ -127,9 +132,21 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+    // 告诉OpenGL，MRT渲染到对应的三个附件
     // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
+    /* cp 深度附件，使用渲染缓冲对象存储深度。
+     深度附件，可以用渲染缓冲，也可以用纹理
+     
+     渲染缓冲对象：
+     优点：在只需深度测试而不需要读取深度数据时，使用渲染缓冲对象可能提供更好的性能。
+     缺点：无法直接读取或操作深度数据。
+     
+     纹理对象：
+     优点：允许在后续渲染过程中访问和使用深度数据（采样），适用于阴影映射和其他需要深度数据的高级效果。
+     缺点：可能比渲染缓冲对象稍慢，因为需要进行纹理操作
+     */
     // create and attach depth buffer (renderbuffer)
     unsigned int rboDepth;
     glGenRenderbuffers(1, &rboDepth);
@@ -187,6 +204,9 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /* cp 1.在离屏帧缓冲进行几何处理，执行MTR把各种几何信息渲染到G缓冲
+         G缓冲中的片段和在屏幕上呈现的像素所包含的片段信息是一样的，因为深度测试已经最终将这里的片段信息作为最顶层的片段
+         */
         // 1. geometry pass: render scene's geometry/color data into gbuffer
         // -----------------------------------------------------------------
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -205,10 +225,12 @@ int main()
                 shaderGeometryPass.setMat4("model", model);
                 backpack.Draw(shaderGeometryPass);
             }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        /* cp 2.在默认帧缓冲进行光照处理，使用G缓冲的几何数据，执行一次光照计算
+         */
         // 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
         // -----------------------------------------------------------------------------------------------------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderLightingPass.use();
         glActiveTexture(GL_TEXTURE0);
@@ -232,6 +254,8 @@ int main()
         // finally render quad
         renderQuad();
 
+        /* cp 3. 把离屏帧缓冲对象的深度缓冲，复制到默认帧缓冲对象中。目的是使得：第4步绘制灯光时，如果灯光深度比离屏帧缓冲中深度大时，片段被过滤掉。避免所有灯光都在最顶部
+         */
         // 2.5. copy content of geometry's depth buffer to default framebuffer's depth buffer
         // ----------------------------------------------------------------------------------
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
@@ -242,6 +266,8 @@ int main()
         glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        /* cp 4.渲染灯光
+         */
         // 3. render lights on top of scene
         // --------------------------------
         shaderLightBox.use();
